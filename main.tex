@@ -1,0 +1,258 @@
+\documentclass[12pt, a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{geometry}
+\usepackage{amsfonts, amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{indentfirst}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\geometry{a4paper, margin={3cm,2cm,2cm,3cm}}
+\setlength{\parindent}{1.25cm}
+
+% --- Configuração de Cores e Estilo para MATLAB ---
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+	language=Matlab,                % Define a linguagem
+	backgroundcolor=\color{white},  % Cor de fundo (white ou backcolour)
+	commentstyle=\color{codegreen}, % Cor dos comentários
+	keywordstyle=\color{blue},      % Cor das palavras-chave (if, else, end)
+	numberstyle=\tiny\color{codegray}, % Estilo dos números de linha
+	stringstyle=\color{codepurple}, % Cor das strings
+	basicstyle=\ttfamily\footnotesize, % Fonte tipo "máquina de escrever"
+	breakatwhitespace=false,         
+	breaklines=true,                 % Quebra automática de linha
+	captionpos=b,                    % Posição da legenda (bottom)
+	keepspaces=true,                 
+	numbers=left,                    % Posição dos números (esquerda)
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2,
+	frame=single,                    % Moldura ao redor do código
+	% --- Suporte para acentos no código (UTF-8) ---
+	literate={á}{{\'a}}1 {ã}{{\~a}}1 {é}{{\'e}}1 {ç}{{\c{c}}}1 {ê}{{\^e}}1 {ó}{{\'o}}1 {í}{{\'i}}1 {ú}{{\'u}}1 {à}{{\`a}}1
+}
+
+\lstset{style=mystyle}
+
+% --- Configuração de Títulos (com titlesec) ---
+% Força os títulos a terem 12pt (\normalsize) e negrito
+
+\titleformat{\section}
+  {\normalsize\bfseries\MakeUppercase} % formato: 12pt e negrito
+  {\thesection.}         % rótulo (número): "1."
+  {1em}                  % separação: 1 "M" de espaço
+  {}                     % código antes do título (pode deixar vazio)
+
+\titleformat{\subsection}
+  {\normalsize\MakeUppercase} % formato: 12pt e negrito
+  {\thesubsection.}      % rótulo (número): "1.1."
+  {1em}                  % separação
+  {}                     % código antes
+
+\titleformat{\subsubsection}
+  {\normalsize\bfseries} % formato: 12pt e negrito
+  {\thesubsubsection.}   % rótulo (número): "1.1.1."
+  {1em}                  % separação
+  {}                     % código antes
+
+\newcommand{\universidade}{Universidade Federal de Santa Catarina}
+\newcommand{\centro}{Centro Tecnológico de Joinville - CTJ}
+\newcommand{\disciplina}{EMB5602 - Controle Digital}
+\newcommand{\curso}{Engenharia Mecatrônica}
+\newcommand{\professor}{Prof. Alexandro Garro Brito}
+\newcommand{\titulo}{Controle de profundidade de veículo subaquático autônomo (AUV)}
+\newcommand{\autor}{Hebert Alan Kubis}
+\newcommand{\matricula}{23102547}
+
+\newcommand{\vehicleMass}{M_t}
+\newcommand{\vehicleVolume}{V_t}
+\newcommand{\SensorPressH}{h_p}
+
+\begin{document}
+	\begin{titlepage}
+		\begin{center}
+			{\bfseries \MakeUppercase{\universidade}}\\
+			{\bfseries \MakeUppercase{\curso}}\\[3cm]
+			
+			{\MakeUppercase{\autor}}\\
+
+			\vfill
+			{\bfseries \MakeUppercase{\titulo}}\\
+			\vfill
+
+			{Joinville}\\
+			{\number\year}
+
+		\end{center}
+	\end{titlepage}
+	
+	% Folha de rosto (ABNT)
+	\begin{titlepage}
+		\begin{center}
+			{\MakeUppercase{\autor}}\\
+			\vfill
+
+			{\bfseries \MakeUppercase{\titulo}}\\[2cm]
+			
+			\hspace*{8cm}
+			\parbox[t]{\dimexpr\textwidth-8cm\relax}{
+				{Trabalho apresentado ao \centro\ da\ \universidade\ como requisito 
+				parcial para a disciplina \disciplina.}\\[1cm]
+				{\professor}\\
+			}\\
+
+			\vfill
+
+			{Joinville}\\
+			{\number\year}
+
+		\end{center}
+	\end{titlepage}
+
+	\begin{abstract}
+		Fazer
+		
+		\vspace{1em}
+		\noindent\textbf{Palavras-chave:} AUV, Controle de Profundidade, Estabilidade
+	\end{abstract}
+	\clearpage
+
+	\tableofcontents
+	\clearpage
+
+	\section{Introdução}
+
+	Fazer uma introdução
+
+	\section{Definição do sistema}
+
+	O sistema sob análise consiste em um Veículo Autônomo Subaquático (AUV -- \textit{Autonomous Underwater Vehicle}) impulsionado por um conjunto de seis propulsores. A configuração de atuadores permite a movimentação no plano horizontal ($xOy$) por meio de quatro thrusters U2 mini e movimento no eixo vertical ($Z$) proporcionado por dois thrusters T100 da BlueRobotics.
+
+	Estruturalmente, o veículo é caracterizado por dois compartimentos cilíndricos estanques, alinhados longitudinalmente ao eixo $X$. O cilindro superior, de maior volume, aloja os sistemas embarcados e a eletrônica de controle. O cilindro inferior, de menor diâmetro, é destinado ao armazenamento da bateria, contribuindo para a estabilidade passiva do sistema (centro de gravidade abaixo do centro 
+	de empuxo).
+	
+	Diante desta configuração, o objetivo central deste projeto de controle é definido como: 
+	\textbf{garantir a estabilização do veículo em uma profundidade de referência especificada.}
+
+		\subsection{Hipóteses de Modelagem}
+			A modelagem matemática do sistema foi obtida com base em algumas hipóteses simplificadoras, que visam capturar a dinâmica essencial do controle de profundidade, ao mesmo tempo em que mantêm a complexidade do modelo em um nível gerenciável para análise e projeto de controladores. As hipóteses adotadas são as seguintes:
+			
+			\begin{itemize}
+				\item \textbf{Desacoplamento dos eixos:} A dinâmica vertical foi analisada isoladamente (1 Grau de Liberdade), assumindo-se que o movimento nos planos horizontal e lateral não influencia significativamente a dinâmica de profundidade;
+
+				\item \textbf{Atuação ideal:} Assumiu-se que a força resultante dos dois propulsores verticais atua diretamente sobre o centro de massa do veículo, não gerando torques de arfagem (\textit{pitch}) ou rolagem (\textit{roll}) indesejados;
+
+				\item \textbf{Sistema de Coordenadas:} Adotou-se o referencial com o eixo $Z$ positivo apontando para baixo (padrão NED - \textit{North-East-Down}), onde o aumento de $Z$ corresponde ao aumento da profundidade;
+
+				\item \textbf{Hidrostática constante:} O veículo é considerado completamente submerso durante toda a operação, garantindo que o volume deslocado e, consequentemente, a força de empuxo, permaneçam constantes.
+			\end{itemize}
+
+		\subsection{Instrumentação e Sensoriamento}
+			A estratégia de controle em malha fechada depende da aquisição precisa dos estados do sistema. O AUV dispõe dos seguintes sensores e métodos para a realimentação:
+			
+			\begin{itemize}
+				\item \textbf{Sensor de Pressão:} Responsável pela medição da pressão hidrostática, a partir da qual a profundidade linear ($z$) é estimada;
+
+				\item \textbf{Unidade de Medida Inercial (IMU):} Integrada à controladora Pixhawk PX4, fornece dados de aceleração linear ($\ddot{z}$) e velocidade angular;
+
+				\item \textbf{Estimação de Velocidade:} A velocidade vertical ($\dot{z}$) não é medida diretamente, sendo obtida através de técnicas de fusão sensorial (como Filtro de Kalman ou Complementar) que combinam a integração da aceleração com a derivação da posição.
+			\end{itemize}
+
+			Esses são os dados disponíveis para utilização no projeto, apesar de que o dado fundamental aqui é a profundidade $z$ medida pela Pixhawk atravez de uma combinação dos dados do sensor de pressão e da IMU, utilizando um filtro de Kalman para obter uma estimativa robusta e precisa da profundidade atual do veículo.
+
+			
+			FIZ ATE AQUI
+
+	\section{Modelagem Matemática do Sistema}
+
+		\subsection{Variáveis do Sistema}
+
+			Para o desenvolvimento do modelo matemático de controle de profundidade do AUV, adotam-se variáveis 
+			genéricas para representar os parâmetros físicos do veículo. Esta abordagem assegura a robustez e a 
+			adaptabilidade do modelo frente a eventuais alterações no projeto mecânico. Os parâmetros fundamentais 
+			são:
+
+			\begin{itemize}
+				\item $\vehicleMass$: Massa total do veículo;
+				
+				\item $\vehicleVolume$: Volume total deslocado pelo veículo;
+			\end{itemize}
+
+		\subsection{Análise Dinâmica e Equilíbrio de Forças}
+
+			A modelagem inicia-se pela análise das forças verticais atuantes sobre o corpo do veículo submerso:
+
+			\begin{itemize}
+				\item Força Peso ($F_{p}$);
+				
+				\item Força de Empuxo ($F_{e}$);
+				
+				\item Força de Atuação dos Propulsores ($F_{m}$);
+				
+				\item Força de Arrasto Hidrodinâmico ($F_{d}$).
+			\end{itemize}
+
+			Aplicando a Segunda Lei de Newton para o movimento de translação no eixo vertical ($Z$), obtém-se o 
+			somatório de forças:
+			
+			\begin{equation}
+				\sum F = F_{p} - F_{e} + F_{m} - F_{d} = m \cdot a
+			\end{equation}
+
+			Onde $a = \frac{d^2z}{dt^2}$ representa a aceleração vertical do veículo. Substituindo as expressões 
+			correspondentes a cada força:
+
+			\begin{equation}
+				M_t \cdot \frac{d^2z}{dt^2} = M_t \cdot g - \rho \cdot g \cdot V_t + F_{m} - B_d \cdot \frac{dz}{dt}
+				\label{eq:dinamica_nao_linear}
+			\end{equation}
+
+			Onde $g$ é a aceleração da gravidade, $\rho$ é a densidade do fluido e $B_d$ é o coeficiente de 
+			amortecimento viscoso linearizado.
+
+\section{Conclusão}
+
+	O presente trabalho abordou o desenvolvimento completo do sistema de controle de profundidade para o AUV Yvy, 
+	abrangendo desde a modelagem física até a validação do controlador em frequência. A obtenção do modelo 
+	matemático linearizado, fundamentado na física do arrasto hidrodinâmico e nos parâmetros reais do veículo, 
+	revelou uma planta de segunda ordem do Tipo 1, intrinsecamente capaz de anular erros de regime para entradas 
+	em degrau.
+
+	A definição rigorosa dos requisitos de desempenho, priorizando a segurança operacional (sobressinal limitado 
+	a 5\%), guiou o projeto do controlador pelo método do Lugar das Raízes. A análise comparativa entre as 
+	estratégias de controle demonstrou que, embora a ação derivativa (PD) permitisse tempos de resposta inferiores 
+	a 1 segundo, tal agressividade implicaria em esforços de controle excessivos e sensibilidade a ruídos. 
+	Portanto, concluiu-se que o controlador puramente \textbf{Proporcional (P)}, com ganho ajustado para 
+	$K_p = 30,35$, representa a solução mais equilibrada, garantindo um tempo de acomodação satisfatório 
+	($T_s \approx 3,5$ s) e robustez contra incertezas de modelagem.
+
+	Por fim, a análise da resposta em frequência validou a estabilidade e a robustez do projeto. O sistema 
+	apresentou Margem de Ganho infinita e uma Margem de Fase elevada ($\approx 73^\circ$), o que assegura um 
+	comportamento bem amortecido e tolerância a atrasos de transporte superiores a 1,8 segundos. A largura de 
+	banda obtida ($\approx 1$ rad/s) confirmou que o sistema de malha fechada atuará efetivamente no rastreamento 
+	de trajetórias de profundidade, filtrando naturalmente perturbações de alta frequência e ruídos de sensores, 
+	atendendo assim a todos os objetivos de engenharia propostos para a operação do AUV Yvy.
+
+	\clearpage
+	\bibliographystyle{plain}
+	\bibliography{referencias}
+	
+	\clearpage
+	\appendix
+
+	\section{Scripts de simulação e análise}
+
+\end{document}
