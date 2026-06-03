@@ -564,7 +564,7 @@
 
 			\begin{figure}[H]
 				\centering
-				\caption{Alteração do Lugar das Raízes com a introdução de um zero em $s=-3$ (Ação PD).}
+				\caption{Lugar das Raízes com a introdução de um zero em $s=-3$ (Ação PD).}
 
 				\includegraphics[width=1\textwidth]{img/testePD.jpg}
 
@@ -575,20 +575,19 @@
 
 			Com a ação derivativa, torna-se possível alocar os polos em regiões com parte real muito mais negativa 
 			(por exemplo, $\sigma \approx -4.54$), resultando em um tempo de acomodação drasticamente reduzido:
-			
+
 			\begin{equation}
 				T_s \approx \frac{4}{4.54} = 0.88 s
 			\end{equation}
 
-			A Figura \ref{fig:Resposta_controlador_PD} apresenta a simulação da resposta temporal para este cenário 
-			agressivo ($K_d = 133$, $K_p = 399$).
+			A Figura \ref{fig:Resposta_controlador_PD} apresenta a simulação da resposta temporal para este cenário agressivo ($K_d = 133$, $K_p = 399$).
 
 			\begin{figure}[H]
 				\centering
-				\caption{Resposta ao degrau com controlador PD sintonizado para alta velocidade ($T_s < 1s$).}
+				\caption{Resposta ao degrau com controlador PD ($T_s < 1s$).}
 
 				\includegraphics[width=0.8\textwidth]{img/respostaPD.jpg}
-				
+
 				\vspace{.5em}
 				\textit{\footnotesize Fonte: Do autor}
 				\label{fig:Resposta_controlador_PD}
@@ -596,31 +595,21 @@
 
 			\subsubsection{Seleção Final da Estrutura de Controle}
 			
-			Embora o controlador PD permita tempos de acomodação inferiores a 1 segundo, {\bfseries optou-se pela 
-			utilização do controlador Proporcional (P)} definido na seção anterior ($K_p = 30,35$). Esta decisão de 
-			projeto baseia-se nos seguintes critérios de engenharia:
+			Embora o controlador PD permita tempos de acomodação inferiores a 1 segundo, {\bfseries optou-se pela utilização do controlador Proporcional (P)} definido na seção anterior ($K_p = 30,35$). Esta decisão de projeto baseia-se nos seguintes critérios de engenharia:
 
 			\begin{enumerate}
-				\item \textbf{Suficiência:} O tempo de acomodação obtido com o controlador P ($\approx 3.5 s$) já 
-				atende com folga ao requisito de $10 s$.
+				\item \textbf{Suficiência:} O tempo de acomodação obtido com o controlador P ($\approx 3.5 s$) já atende com folga ao requisito de $10 s$.
 
-				\item \textbf{Esforço de Controle:} A resposta extremamente rápida do PD ($0.88 s$) exigiria picos 
-				de corrente elevados nos motores, levando à saturação dos atuadores e invalidando o modelo linear.
+				\item \textbf{Esforço de Controle:} A resposta extremamente rápida do PD ($0.88 s$) exigiria picos de corrente elevados nos motores, levando à saturação dos atuadores e invalidando o modelo linear.
 
-				\item \textbf{Imunidade a Ruídos:} A ação derivativa amplifica ruídos de alta frequência 
-				provenientes dos sensores. Em um ambiente subaquático real, isso causaria vibração excessiva nos 
-				propulsores sem benefício prático na dinâmica lenta de profundidade.
+				\item \textbf{Imunidade a Ruídos:} A ação derivativa amplifica ruídos de alta frequência provenientes dos sensores. Em um ambiente subaquático real, isso causaria vibração excessiva nos propulsores sem benefício prático na dinâmica lenta de profundidade.
 			\end{enumerate}
-			
-			Dessa forma, o controlador proporcional apresenta a melhor relação custo-benefício (complexidade vs. 
-			desempenho) para esta aplicação.
+
+			Dessa forma, o controlador proporcional apresenta a melhor relação custo-benefício (complexidade vs. desempenho) para esta aplicação.
 
 		\subsection{Análise de Resposta em Frequência}
 
-			Com a planta e o controlador definidos, realiza-se a análise da resposta em frequência para avaliar a 
-			estabilidade relativa e a robustez do sistema. Para isso, foram obtidos os Diagramas de Bode da função 
-			de transferência de malha aberta ($L(s)$) e de malha fechada ($H(s)$), considerando o ganho escolhido 
-			$K_p = 30,35$.
+			Com a planta e o controlador definidos, realizou-se a análise da resposta em frequência para avaliar a estabilidade relativa e a robustez do sistema. Para isso, foram obtidos os Diagramas de Bode da função de transferência de malha aberta ($L(s)$) e de malha fechada ($H(s)$), considerando o ganho escolhido $K_p = 30,35$.
 
 			A função de transferência de malha aberta analisada é dada por:
 
@@ -628,8 +617,7 @@
 				L(s) = C(s)G(s) = 30,35 \cdot \frac{0,0526}{s(s + 2,2105)} = \frac{1,596}{s^2 + 2,2105s}
 			\end{equation}
 
-			As Figuras \ref{fig:resposta_em_frequencia_MA} e \ref{fig:resposta_em_frequencia_MF} apresentam, 
-			respectivamente, os diagramas de Bode de malha aberta e fechada obtidos via simulação.
+			As Figuras \ref{fig:resposta_em_frequencia_MA} e \ref{fig:resposta_em_frequencia_MF} apresentam, respectivamente, os diagramas de Bode de malha aberta e fechada obtidos via simulação.
 
 			\begin{figure}[H]
 				\centering
@@ -655,58 +643,37 @@
 
 			\subsubsection{Margens de Estabilidade}
 
-			A {\bfseries Margem de Ganho (MG)} é avaliada na frequência de cruzamento de fase ($\omega_{pc}$), 
-			onde a fase atinge $-180^\circ$ \cite{Ogata}. Analisando o diagrama de fase da Figura 
-			\ref{fig:resposta_em_frequencia_MA}, observa-se que, devido à estrutura do sistema (dois polos, um 
-			na origem), a fase tende assintoticamente a $-180^\circ$ quando $\omega \to \infty$, mas nunca cruza 
-			este valor para frequências finitas. Matematicamente:
+			A {\bfseries Margem de Ganho (MG)} é avaliada na frequência de cruzamento de fase ($\omega_{pc}$), onde a fase atinge $-180^\circ$ \cite{Ogata}. Analisando o diagrama de fase da Figura \ref{fig:resposta_em_frequencia_MA}, observa-se que, devido à estrutura do sistema (dois polos, um na origem), a fase tende assintoticamente a $-180^\circ$ quando $\omega \to \infty$, mas nunca cruza este valor para frequências finitas. Matematicamente:
 
 			\begin{equation}
 				MG_{dB} = -20\log{|L(j\omega_{pc})|} \xrightarrow{\omega_{pc} \to \infty} -20\log{0} \to +\infty \text{ dB}
 			\end{equation}
 
-			A margem de ganho infinita corrobora a análise do Lugar das Raízes, confirmando que o sistema é 
-			estruturalmente estável para qualquer ganho positivo $K_p$.
+			A margem de ganho infinita corrobora a análise do Lugar das Raízes, confirmando que o sistema é estruturalmente estável para qualquer ganho positivo $K_p$.
 
-			A {\bfseries Margem de Fase (MF)} é avaliada na frequência de cruzamento de ganho ($\omega_{gc}$), 
-			onde a magnitude é $0 \text{ dB}$ \cite{Ogata}. Pela inspeção visual do diagrama e cálculo analítico, tem-se 
-			$\omega_{gc} \approx 0,69 \text{ rad/s}$ e uma fase de $\approx -107^\circ$. Portanto:
+			A {\bfseries Margem de Fase (MF)} é avaliada na frequência de cruzamento de ganho ($\omega_{gc}$), onde a magnitude é $0 \text{ dB}$ \cite{Ogata}. Pela inspeção visual do diagrama e cálculo analítico, tem-se $\omega_{gc} \approx 0,69 \text{ rad/s}$ e uma fase de $\approx -107^\circ$. Portanto:
 
 			\begin{equation}
 				MF = 180^\circ + \phi(\omega_{gc}) = 180^\circ - 107^\circ = 73^\circ
 			\end{equation}
 
-			Este valor elevado de Margem de Fase indica que o sistema em malha fechada é altamente robusto e bem 
-			amortecido (comportamento equivalente a $\zeta \approx MF/100 = 0,73$), o que explica o baixo 
-			sobressinal observado nas simulações temporais.
+			Este valor elevado de Margem de Fase indica que o sistema em malha fechada é altamente robusto e bem amortecido (comportamento equivalente a $\zeta \approx MF/100 = 0,73$), o que explica o baixo sobressinal observado nas simulações temporais.
 
-			Além disso, a Margem de Fase determina a tolerância do sistema a atrasos puros de tempo ($t_{delay}$), 
-			como aqueles introduzidos por processamento digital e sensores:
+			Além disso, a Margem de Fase determina a tolerância do sistema a atrasos puros de tempo ($t_{delay}$), como aqueles introduzidos por processamento digital e sensores:
 
 			\begin{equation}
 				t_{delay_{max}} = \frac{MF_{rad}}{\omega_{gc}} = \frac{73 \cdot \frac{\pi}{180}}{0,69} \approx 1,86 \text{ s}
 			\end{equation}
 
-			O sistema suporta um atraso de até $1,86 \text{ s}$ na malha de controle antes de se tornar instável. 
-			Considerando que os atrasos reais do hardware (sensores e atuadores) são da ordem de milissegundos, a 
-			estabilidade está garantida com ampla margem de segurança.
+			O sistema suporta um atraso de até $1,86 \text{ s}$ na malha de controle antes de se tornar instável. Considerando que os atrasos reais do hardware (sensores e atuadores) são da ordem de milissegundos, a estabilidade está garantida com ampla margem de segurança.
 
 			\subsubsection{Largura de Banda}
 
-			A {\bfseries Largura de Banda ($\omega_{BW}$)} do sistema em malha fechada 
-			(Figura \ref{fig:resposta_em_frequencia_MF}) é a frequência na qual o ganho cai para $-3 \text{ dB}$ 
-			em relação ao valor DC. O valor obtido foi de aproximadamente $\omega_{BW} \approx 1 \text{ rad/s}$ 
-			($0,16 \text{ Hz}$).
+			A {\bfseries Largura de Banda ($\omega_{BW}$)} do sistema em malha fechada (Figura \ref{fig:resposta_em_frequencia_MF}) é a frequência na qual o ganho cai para $-3 \text{ dB}$ em relação ao valor DC. O valor obtido foi de aproximadamente $\omega_{BW} \approx 1 \text{ rad/s}$ ($0,16 \text{ Hz}$).
 
-			Esta largura de banda caracteriza a velocidade de resposta do sistema. Ela indica que o AUV consegue 
-			rastrear comandos de referência que variem lentamente (abaixo de $0,16 \text{ Hz}$), mas atua como um 
-			{\bfseries filtro passa-baixas} para frequências superiores. Isso é benéfico para a aplicação, pois o 
-			sistema naturalmente filtra ruídos de alta frequência dos sensores e rejeita perturbações rápidas da 
-			água que a dinâmica inercial do veículo não seria capaz de acompanhar fisicamente, evitando desgaste 
-			desnecessário dos atuadores.
+			Esta largura de banda caracteriza a velocidade de resposta do sistema. Ela indica que o AUV consegue rastrear comandos de referência que variem lentamente (abaixo de $0,16 \text{ Hz}$), mas atua como um {\bfseries filtro passa-baixas} para frequências superiores. Isso é benéfico para a aplicação, pois o sistema naturalmente filtra ruídos de alta frequência dos sensores e rejeita perturbações rápidas da água que a dinâmica inercial do veículo não seria capaz de acompanhar fisicamente, evitando desgaste desnecessário dos atuadores.
 
-			Abaixo, resumem-se os valores exatos extraídos via software, que validam a análise visual e analítica 
-			realizada:
+			Abaixo, resumem-se os valores exatos extraídos via software, que validam a análise visual e analítica realizada:
 
 			\begin{itemize}
 				\item Margem de Ganho (MG): $\infty$ dB
@@ -717,31 +684,16 @@
 
 \section{Conclusão}
 
-	O presente trabalho abordou o desenvolvimento completo do sistema de controle de profundidade para o AUV Yvy, 
-	abrangendo desde a modelagem física até a validação do controlador em frequência. A obtenção do modelo 
-	matemático linearizado, fundamentado na física do arrasto hidrodinâmico e nos parâmetros reais do veículo, 
-	revelou uma planta de segunda ordem do Tipo 1, intrinsecamente capaz de anular erros de regime para entradas 
-	em degrau.
+	O presente trabalho abordou o desenvolvimento completo do sistema de controle de profundidade para o AUV Yvy, abrangendo desde a modelagem física até a validação do controlador em frequência. A obtenção do modelo matemático linearizado, fundamentado na física do arrasto hidrodinâmico e nos parâmetros reais do veículo, revelou uma planta de segunda ordem do Tipo 1, intrinsecamente capaz de anular erros de regime para entradas em degrau.
 
-	A definição rigorosa dos requisitos de desempenho, priorizando a segurança operacional (sobressinal limitado 
-	a 5\%), guiou o projeto do controlador pelo método do Lugar das Raízes. A análise comparativa entre as 
-	estratégias de controle demonstrou que, embora a ação derivativa (PD) permitisse tempos de resposta inferiores 
-	a 1 segundo, tal agressividade implicaria em esforços de controle excessivos e sensibilidade a ruídos. 
-	Portanto, concluiu-se que o controlador puramente \textbf{Proporcional (P)}, com ganho ajustado para 
-	$K_p = 30,35$, representa a solução mais equilibrada, garantindo um tempo de acomodação satisfatório 
-	($T_s \approx 3,5$ s) e robustez contra incertezas de modelagem.
+	A definição rigorosa dos requisitos de desempenho, priorizando a segurança operacional (sobressinal limitado a 5\%), guiou o projeto do controlador pelo método do Lugar das Raízes. A análise comparativa entre as estratégias de controle demonstrou que, embora a ação derivativa (PD) permitisse tempos de resposta inferiores a 1 segundo, tal agressividade implicaria em esforços de controle excessivos e sensibilidade a ruídos. Portanto, concluiu-se que o controlador puramente \textbf{Proporcional (P)}, com ganho ajustado para $K_p = 30,35$, representa a solução mais equilibrada, garantindo um tempo de acomodação satisfatório ($T_s \approx 3,5$ s) e robustez contra incertezas de modelagem.
 
-	Por fim, a análise da resposta em frequência validou a estabilidade e a robustez do projeto. O sistema 
-	apresentou Margem de Ganho infinita e uma Margem de Fase elevada ($\approx 73^\circ$), o que assegura um 
-	comportamento bem amortecido e tolerância a atrasos de transporte superiores a 1,8 segundos. A largura de 
-	banda obtida ($\approx 1$ rad/s) confirmou que o sistema de malha fechada atuará efetivamente no rastreamento 
-	de trajetórias de profundidade, filtrando naturalmente perturbações de alta frequência e ruídos de sensores, 
-	atendendo assim a todos os objetivos de engenharia propostos para a operação do AUV Yvy.
+	Por fim, a análise da resposta em frequência validou a estabilidade e a robustez do projeto. O sistema apresentou Margem de Ganho infinita e uma Margem de Fase elevada ($\approx 73^\circ$), o que assegura um comportamento bem amortecido e tolerância a atrasos de transporte superiores a 1,8 segundos. A largura de banda obtida ($\approx 1$ rad/s) confirmou que o sistema de malha fechada atuará efetivamente no rastreamento de trajetórias de profundidade, filtrando naturalmente perturbações de alta frequência e ruídos de sensores, atendendo assim a todos os objetivos de engenharia propostos para a operação do AUV Yvy.
 
 	\clearpage
 	\bibliographystyle{plain}
 	\bibliography{referencias}
-	
+
 	\clearpage
 	\appendix
 
