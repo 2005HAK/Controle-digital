@@ -1,0 +1,21 @@
+\begin{thebibliography}{1}
+
+\bibitem{bluev2}
+{BlueRobotics}.
+\newblock Bluerov2.
+
+\bibitem{bbauv4.5}
+{Bumblebee}.
+\newblock {Bumblebee AUV 4.5}, 2025.
+
+\bibitem{FoxMcDonald}
+Robert~W. Fox, Alan~T. McDonald, and Philip~J. Pritchard.
+\newblock {\em Introdução à Mecânica dos Fluidos}.
+\newblock LTC, 8 edition, 2014.
+
+\bibitem{Ogata}
+Katsuhiko Ogata.
+\newblock {\em Engenharia de Controle Moderno}.
+\newblock Pearson, 5 edition, 2014.
+
+\end{thebibliography}

@@ -144,12 +144,11 @@
 	Estruturalmente, o veículo é caracterizado por dois compartimentos cilíndricos estanques, alinhados longitudinalmente ao eixo $X$. O cilindro superior, de maior volume, aloja os sistemas embarcados e a eletrônica de controle. O cilindro inferior, de menor diâmetro, é destinado ao armazenamento da bateria, contribuindo para a estabilidade passiva do sistema (centro de gravidade abaixo do centro 
 	de empuxo).
 	
-	Diante desta configuração, o objetivo central deste projeto de controle é definido como: 
-	\textbf{garantir a estabilização do veículo em uma profundidade de referência especificada.}
+	Diante desta configuração, o objetivo central deste projeto de controle é definido como: \textbf{garantir a estabilização do veículo em uma profundidade de referência especificada a partir de um sistema de controle digital implementado no veículo.}
 
 		\subsection{Hipóteses de Modelagem}
 			A modelagem matemática do sistema foi obtida com base em algumas hipóteses simplificadoras, que visam capturar a dinâmica essencial do controle de profundidade, ao mesmo tempo em que mantêm a complexidade do modelo em um nível gerenciável para análise e projeto de controladores. As hipóteses adotadas são as seguintes:
-			
+
 			\begin{itemize}
 				\item \textbf{Desacoplamento dos eixos:} A dinâmica vertical foi analisada isoladamente (1 Grau de Liberdade), assumindo-se que o movimento nos planos horizontal e lateral não influencia significativamente a dinâmica de profundidade;
 
@@ -162,7 +161,7 @@
 
 		\subsection{Instrumentação e Sensoriamento}
 			A estratégia de controle em malha fechada depende da aquisição precisa dos estados do sistema. O AUV dispõe dos seguintes sensores e métodos para a realimentação:
-			
+
 			\begin{itemize}
 				\item \textbf{Sensor de Pressão:} Responsável pela medição da pressão hidrostática, a partir da qual a profundidade linear ($z$) é estimada;
 
@@ -171,23 +170,17 @@
 				\item \textbf{Estimação de Velocidade:} A velocidade vertical ($\dot{z}$) não é medida diretamente, sendo obtida através de técnicas de fusão sensorial (como Filtro de Kalman ou Complementar) que combinam a integração da aceleração com a derivação da posição.
 			\end{itemize}
 
-			Esses são os dados disponíveis para utilização no projeto, apesar de que o dado fundamental aqui é a profundidade $z$ medida pela Pixhawk atravez de uma combinação dos dados do sensor de pressão e da IMU, utilizando um filtro de Kalman para obter uma estimativa robusta e precisa da profundidade atual do veículo.
-
-			
-			FIZ ATE AQUI
+			Esses são os dados disponíveis para utilização no projeto, sendo que o dado fundamental aqui é a profundidade $z$ medida pela Pixhawk atravez de uma combinação dos dados do sensor de pressão e da IMU, utilizando um filtro de Kalman para obter uma estimativa robusta e precisa da profundidade atual do veículo.
 
 	\section{Modelagem Matemática do Sistema}
 
 		\subsection{Variáveis do Sistema}
 
-			Para o desenvolvimento do modelo matemático de controle de profundidade do AUV, adotam-se variáveis 
-			genéricas para representar os parâmetros físicos do veículo. Esta abordagem assegura a robustez e a 
-			adaptabilidade do modelo frente a eventuais alterações no projeto mecânico. Os parâmetros fundamentais 
-			são:
+			Para o desenvolvimento do modelo matemático de controle de profundidade do AUV, adotou-se variáveis genéricas para representar os parâmetros físicos do veículo. Esta abordagem assegura a robustez e a adaptabilidade do modelo frente a eventuais alterações no projeto mecânico. Os parâmetros fundamentais são:
 
 			\begin{itemize}
 				\item $\vehicleMass$: Massa total do veículo;
-				
+
 				\item $\vehicleVolume$: Volume total deslocado pelo veículo;
 			\end{itemize}
 
@@ -196,32 +189,531 @@
 			A modelagem inicia-se pela análise das forças verticais atuantes sobre o corpo do veículo submerso:
 
 			\begin{itemize}
-				\item Força Peso ($F_{p}$);
-				
-				\item Força de Empuxo ($F_{e}$);
-				
-				\item Força de Atuação dos Propulsores ($F_{m}$);
-				
-				\item Força de Arrasto Hidrodinâmico ($F_{d}$).
+				\item $F_{p}$: Força Peso;
+
+				\item $F_{e}$: Força de Empuxo;
+
+				\item $F_{m}$: Força de Atuação dos Propulsores;
+
+				\item $F_{d}$: Força de Arrasto Hidrodinâmico.
 			\end{itemize}
 
-			Aplicando a Segunda Lei de Newton para o movimento de translação no eixo vertical ($Z$), obtém-se o 
-			somatório de forças:
-			
+			Aplicando a Segunda Lei de Newton para o movimento de translação no eixo vertical ($z$), obtém-se o somatório de forças:
+
 			\begin{equation}
-				\sum F = F_{p} - F_{e} + F_{m} - F_{d} = m \cdot a
+				\sum F = F_{p} - F_{e} + F_{m} - F_{d} = m a
 			\end{equation}
 
-			Onde $a = \frac{d^2z}{dt^2}$ representa a aceleração vertical do veículo. Substituindo as expressões 
-			correspondentes a cada força:
+			Onde $a = \frac{d^2z}{dt^2}$ representa a aceleração vertical do veículo. Substituindo as expressões correspondentes a cada força:
 
 			\begin{equation}
-				M_t \cdot \frac{d^2z}{dt^2} = M_t \cdot g - \rho \cdot g \cdot V_t + F_{m} - B_d \cdot \frac{dz}{dt}
+				M_t \frac{d^2z}{dt^2} = M_t g - \rho g V_t + F_{m} - B_d \frac{dz}{dt}
 				\label{eq:dinamica_nao_linear}
 			\end{equation}
 
-			Onde $g$ é a aceleração da gravidade, $\rho$ é a densidade do fluido e $B_d$ é o coeficiente de 
-			amortecimento viscoso linearizado.
+			Onde $g$ é a aceleração da gravidade, $\rho$ é a densidade do fluido e $B_d$ é o coeficiente de amortecimento viscoso linearizado.
+
+		\subsection{Linearização em Torno do Ponto de Operação}
+
+			Para aplicar técnicas de controle linear, analisou-se o sistema em torno de um ponto de equilíbrio. Definiu-se a posição instantânea $z(t)$ e a força dos propulsores $F_m(t)$ como a soma de um valor de equilíbrio constante e uma pequena perturbação ($\Delta$):
+
+			\begin{equation}
+				z(t) = z_0 + \Delta z(t) \quad \text{e} \quad F_m(t) = F_{me} + \Delta F_m(t)
+			\end{equation}
+
+			Substituindo estas definições na Equação \ref{eq:dinamica_nao_linear}:
+
+			\begin{equation}
+				M_t \frac{d^2(z_0 + \Delta z)}{dt^2} = (M_t g - \rho g V_t) + (F_{me} + \Delta F_m) - B_d \frac{d(z_0 + \Delta z)}{dt}
+			\end{equation}
+
+			Considerando que as derivadas das constantes de equilíbrio ($z_0, F_{me}$) são nulas, e sabendo que no equilíbrio estático ($\dot{z}=0, \ddot{z}=0$) a força de sustentação dos motores deve equilibrar o peso aparente do veículo:
+
+			\begin{equation}
+				F_{me} = \rho g V_t - M_t g
+				\label{eq:equilibrio_estatico}
+			\end{equation}
+
+			Substituindo a condição de equilíbrio estático (\ref{eq:equilibrio_estatico}) na equação dinâmica (\ref{eq:dinamica_nao_linear}), os termos constantes se cancelam, restando apenas a dinâmica das perturbações:
+
+			\begin{equation}
+				M_t \frac{d^2z}{dt^2} = M_t g - \rho g V_t + \rho g V_t - M_t g - B_d \frac{dz}{dt}
+				\label{eq:dinamica_linearizada_intermediaria}
+			\end{equation}
+
+			\begin{equation}
+				M_t \frac{d^2 \Delta z}{dt^2} + B_d \frac{d \Delta z}{dt} = \Delta F_{m}
+				\label{eq:dinamica_linearizada}
+			\end{equation}
+
+		\subsection{Obtenção da Função de Transferência}
+
+			Aplicando a Transformada de Laplace na Equação \ref{eq:dinamica_linearizada} e assumindo condições iniciais nulas ($\Delta z(0) = 0$, $\Delta \dot{z}(0) = 0$):
+
+			\begin{equation}
+				M_t s^2 \Delta Z(s) + B_d s \Delta Z(s) = \Delta F_{m}(s)
+			\end{equation}
+
+			Fatorando $\Delta Z(s)$, obtém-se a Função de Transferência que relaciona a variação de profundidade com a variação da força de atuação:
+
+			\begin{equation}
+				\frac{\Delta Z(s)}{\Delta F_{m}(s)} = \frac{1}{M_t s^2 + B_d s}
+			\end{equation}
+
+			Para facilitar a análise de controle, a equação é normalizada para a forma padrão:
+
+			\begin{equation}
+				G(s) = \frac{\Delta Z(s)}{\Delta F_{m}(s)} = \frac{1/M_t}{s(s + B_d/M_t)}
+				\label{eq:ft_final}
+			\end{equation}
+
+			A análise da Equação \ref{eq:ft_final} revela que a planta é um sistema de {\bfseries segunda ordem do Tipo 1}, caracterizado pela presença de um polo na origem ($s=0$) e um polo real estável em $s = -B_d/M_t$. A presença do integrador natural (polo na origem) implica que o sistema possui erro nulo em regime permanente para uma entrada do tipo degrau de força, dispensando a necessidade de ação integral no controlador para este fim. Desta forma, a estratégia de controle poderá focar em controladores do tipo Proporcional (P) ou Proporcional-Derivativo (PD) para ajuste da resposta transitória.
+
+		\subsection{Determinação dos Parâmetros do Sistema}
+
+			A simulação e o projeto do controlador exigem a determinação mais fidedigna possível dos parâmetros físicos do veículo Yvy. Com base em medições experimentais e dados do projeto mecânico, foram definidos os seguintes valores:
+
+			\begin{itemize}
+				\item Massa do veículo ($\vehicleMass$): 19 kg;
+
+				\item Volume deslocado ($\vehicleVolume$): 0.014 m$^3$;
+
+				\item Densidade do fluido ($\rho$): 1000 kg/m$^3$ (água doce);
+
+				\item Aceleração da gravidade ($g$): 9.81 m/s$^2$.
+			\end{itemize}
+
+			A massa foi obtida experimentalmente utilizando uma balança de precisão no Laboratório de Interação Fluido-Estrutura (LIFE) da \universidade. O volume foi extraído diretamente do modelo CAD do veículo (software SolidWorks).
+
+				\subsubsection{Coeficiente de Amortecimento Hidrodinâmico}
+
+					A determinação do coeficiente de arrasto linearizado ($B_d$) requer uma análise da hidrodinâmica do veículo. Dada a geometria complexa do AUV, adotou-se a aproximação de um corpo rombudo (cubo) de aresta $L = 0.4$ m, compatível com as dimensões reais de $0.38 \times 0.4 \times 0.38$ m.	
+
+					Primeiramente, validou-se a hipótese de regime turbulento. Calculou-se o Número de Reynolds ($Re$) considerando uma velocidade baixa de $v = 0.1$ m/s, representando o início do movimento, e viscosidade dinâmica da água $\mu = 0.001$ Pa.s:
+
+					\begin{equation}
+						Re = \frac{\rho \cdot v \cdot L}{\mu} = \frac{1000 \cdot 0.1 \cdot 0.4}{0.001} = 40.000
+					\end{equation}
+
+					Como $Re \gg 10^4$ mesmo em baixas velocidades, confirma-se que o escoamento é predominantemente turbulento, validando o uso de um coeficiente de arrasto constante $C_d \approx 1.05$ para geometria cúbica conforme tabela 9.3 em Fox et al. \cite{FoxMcDonald}.
+
+					No entanto, a equação dinâmica linearizada (Eq. \ref{eq:dinamica_linearizada}) exige um coeficiente de amortecimento linear ($B_d$), enquanto o arrasto físico é quadrático ($F_d \propto v^2$). Para contornar isso, realizou-se a linearização da força de arrasto em torno de uma velocidade de operação nominal $v_{op} = 0.5$ m/s. Este valor foi definido com base na análise de AUVs de porte similar, como o BlueROV2 \cite{bluev2} e o BBAUV 4.5 \cite{bbauv4.5}.
+
+					A equivalência de forças no ponto de operação é dada por:
+
+					\begin{equation}
+						F_{d_{linear}} = F_{d_{quadratico}} \implies B_d \cdot v_{op} = \frac{1}{2} \rho \cdot v_{op}^2 \cdot C_d \cdot A
+					\end{equation}
+
+					Onde $A = 0.16$ m$^2$ é a área da seção transversal ($0.4 \times 0.4$ m). Isolando $B_d$:
+
+					\begin{equation}
+						B_d = \frac{1}{2} \rho \cdot v_{op} \cdot C_d \cdot A
+					\end{equation}
+
+					Substituindo os valores:
+
+					\begin{equation}
+						B_d = 0.5 \cdot 1000 \cdot 0.5 \cdot 1.05 \cdot 0.16 = 42 \text{ kg/s (ou Ns/m)}
+					\end{equation}
+
+					Ressalta-se que o coeficiente $B_d$ calculado é uma aproximação válida nas vizinhanças da velocidade de operação ($0.5$ m/s). Velocidades verticais significativamente superiores resultarão em forças de arrasto maiores do que as previstas pelo modelo linear (amortecimento subestimado), enquanto velocidades inferiores resultarão em forças menores (amortecimento superestimado). O controlador deve, portanto, apresentar robustez suficiente para lidar com essas variações paramétricas.
+
+		\subsection{Análise de Estabilidade e Lugar das Raízes}
+
+			Substituindo os parâmetros físicos determinados na seção anterior ($M_t = 19$ kg e $B_d = 42$ kg/s) na equação da planta, obtém-se a função de transferência numérica do sistema:
+
+			\begin{equation}
+				G(s) = \frac{\Delta Z(s)}{\Delta F_{m}(s)} = \frac{1/19}{s(s + 42/19)} = \frac{0,0526}{s(s + 2,2105)}
+				\label{eq:ft_numerica}
+			\end{equation}
+
+			A análise dos polos de malha aberta revela raízes em $s_1 = 0$ e $s_2 = -2,2105$. A presença do polo na origem confirma que o sistema é {\bfseries marginalmente estável} em malha aberta, comportando-se como um integrador com amortecimento.
+
+			Para avaliar o comportamento do sistema em malha fechada sob ação de controle, traçou-se o Lugar das Raízes (Root Locus) utilizando o software MATLAB, conforme apresentado na Figura \ref{fig:root_locus_Gs}.
+
+			\begin{figure}[H]
+				\centering
+				\caption{Lugar das Raízes da planta do AUV para um controlador proporcional.}
+
+				\includegraphics[width=0.8\textwidth]{img/root_locus_Gs.jpg}
+
+				\textit{\footnotesize Fonte: Do autor}
+				\label{fig:root_locus_Gs}
+			\end{figure}
+
+			A análise do lugar das raízes permite concluir que:
+
+			\begin{enumerate}
+				\item {\bfseries Estabilidade Absoluta:} Os ramos do lugar das raízes permanecem inteiramente no semiplano esquerdo complexo para qualquer ganho $K > 0$. Isso indica que o sistema em malha fechada é {\bfseries incondicionalmente estável} com um controlador Proporcional.
+
+				\item {\bfseries Comportamento Dinâmico:} Para ganhos baixos, o sistema apresenta polos reais distintos (superamortecido). À medida que o ganho aumenta, os polos convergem para o ponto de separação (em $s \approx -1,105$) e tornam-se complexos conjugados, resultando em uma resposta subamortecida (oscilatória).
+			\end{enumerate}
+
+			Portanto, valida-se a hipótese de que um controlador do tipo Proporcional (P) é suficiente para estabilizar a profundidade do veículo. A adição de um termo derivativo (PD) também será explorada posteriormente para verificar como a insersão do termo derivativo afeta o desempenho do sistema.
+
+	\section{Projeto do Controlador}
+
+		\subsection{Definição dos Requisitos de Desempenho}
+
+			Para o projeto do sistema de controle de profundidade, é fundamental estabelecer critérios de desempenho que garantam a operabilidade e a segurança do AUV Yvy. A definição destes requisitos baseia-se nas limitações físicas do veículo, na dinâmica do ambiente subaquático e nas restrições de segurança da missão.
+
+			\subsubsection{Percentual de Sobressinal}
+
+				A limitação do Percentual de Sobressinal (PSS) é o requisito mais crítico deste projeto, justificado estritamente pela \textbf{segurança operacional e integridade física do veículo}.
+
+				Considerando um cenário operacional onde o AUV deve realizar manobras próximas ao leito marinho ou ao fundo de um tanque de testes, um sobressinal excessivo pode resultar em colisão. Por exemplo, assuma-se uma manobra de descida onde o veículo parte de $z_{ini} = 1,0 \text{ m}$ para uma referência $z_{ref} = 5,0 \text{ m}$, em um local onde a profundidade total é $z_{solo} = 5,1 \text{ m}$.
+
+				Neste caso, a variação de profundidade é:
+
+				\begin{equation}
+					\Delta z = z_{ref} - z_{ini} = 5,0 - 1,0 = 4,0 \text{ m}
+				\end{equation}
+
+				Se o sistema apresentar um sobressinal de apenas $5\%$, a profundidade máxima atingida ($z_{pico}$) será:
+
+				\begin{equation}
+					z_{pico} = z_{ref} + \left(\Delta z \cdot \frac{PSS}{100}\right) = 5,0 + (4,0 \cdot 0,05) = 5,2 \text{ m}
+				\end{equation}
+
+				Neste cenário hipotético, o veículo tentaria atingir 5,2 m, colidindo inevitavelmente com o solo em 5,1 m. Tal impacto, mesmo em baixa velocidade, pode danificar sensores críticos (DVL, sonar, câmeras) e levantar sedimentos que prejudicam a navegação visual.
+
+				Portanto, define-se como requisito estrito que:
+
+				\begin{equation}
+					PSS \le 5\%
+				\end{equation}
+
+				Adicionalmente, recomenda-se como regra de segurança que a referência de profundidade nunca exceda $95\%$ da profundidade máxima local ($z_{ref} \le 0,95 \cdot h_{max}$).
+
+			\subsubsection{Tempo de Acomodação}
+
+				O tempo de acomodação ($T_s$) define a rapidez de resposta do sistema. Para estipular um valor factível, deve-se considerar a limitação física de velocidade do atuador e do arrasto hidrodinâmico.
+
+				Retomando o cenário de uma variação de profundidade de $\Delta z = 4 \text{ m}$ e considerando a velocidade de operação linearizada do modelo, $v_{op} = 0,5 \text{ m/s}$, o tempo mínimo de trânsito físico ($T_{transito}$) é:
+
+				\begin{equation}
+					T_{transito} = \frac{\Delta z}{v_{op}} = \frac{4}{0,5} = 8 \text{ s}
+				\end{equation}
+
+				Como o sistema dinâmico necessita de um tempo adicional para desacelerar e estabilizar na referência (entrar na faixa de erro de 2\%), define-se uma margem de 2 segundos sobre o tempo de trânsito. Assim, o requisito de desempenho temporal é estabelecido como:
+
+				\begin{equation}
+					T_s \le 10 \text{ s} \quad \text{(critério de 2\%)}
+				\end{equation}
+
+			\subsubsection{Erro em Regime Permanente}
+
+				O objetivo fundamental do controle é garantir que o veículo atinja a profundidade desejada com precisão. Portanto, exige-se que:
+
+				\begin{equation}
+					e_{ss} = 0 \quad \text{para entrada do tipo degrau}
+				\end{equation}
+
+				Conforme analisado na modelagem matemática, a planta do AUV possui um polo na origem ($1/s$), comportando-se como um integrador puro na relação força-velocidade. Isso classifica o sistema como sendo do \textbf{Tipo 1}. Pela teoria de controle clássico (Tabela 5.1 em Ogata, Katsuhiko \cite{Ogata}), sistemas do Tipo 1 garantem naturalmente erro nulo em regime permanente para entradas em degrau, satisfazendo este requisito estruturalmente sem a necessidade de ação integral adicional no controlador.
+
+		\subsection{Análise do Lugar das Raízes e Definição de Ganhos}
+
+			A Figura \ref{fig:root_locus_Gs} apresentou a estabilidade absoluta do sistema para qualquer ganho positivo. Nesta seção, delimitam-se as regiões no plano complexo que satisfazem os requisitos de desempenho temporal estabelecidos, permitindo a seleção do ganho $K_p$ adequado.
+
+			A função de transferência de malha fechada para o controlador proporcional é dada por:
+
+			\begin{equation}
+				\frac{\Delta Z(s)}{\Delta Z_{ref}(s)} = \frac{0.0526 K_p}{s^2 + 2.2105s + 0.0526 K_p}
+			\end{equation}
+
+			Comparando o denominador com a forma padrão de segunda ordem ($s^2 + 2\zeta\omega_n s + \omega_n^2$), identificam-se as relações:
+
+			\begin{equation}
+				\omega_n^2 = 0.0526K_p \quad \text{e} \quad 2 \zeta \omega_n = 2.2105
+				\label{eq:params_mf}
+			\end{equation}
+
+			\subsubsection{Região de Tempo de Acomodação}
+
+			O requisito de tempo de acomodação ($T_s \le 10$ s, critério de 2\%) impõe uma restrição sobre a parte real dos polos ($\sigma = \zeta\omega_n$):
+
+			\begin{equation}
+				T_s \approx \frac{4}{\zeta \omega_n} \le 10 \implies \zeta \omega_n \ge 0.4
+			\end{equation}
+
+			Como os polos estáveis possuem parte real negativa, a condição no plano complexo é:
+
+			\begin{equation}
+				\text{Re}(s) \le -0.4
+			\end{equation}
+
+			Observando o Lugar das Raízes, nota-se que a parte real dos polos complexos é fixa em $-1.105$ (metade da soma dos polos de malha aberta). Como $-1.105 < -0.4$, o requisito de tempo de acomodação é {\bfseries naturalmente satisfeito para qualquer ganho} que resulte em polos complexos, conforme ilustrado na Figura \ref{fig:TsRegion}.
+
+			\begin{figure}[H]
+				\centering
+				\caption{Lugar das Raízes com destaque para a região que atende ao requisito de $T_s \le 10s$ (área verde).}
+
+				\includegraphics[width=0.9 \textwidth]{img/TsRegion.jpg}
+
+				\textit{\footnotesize Fonte: Do autor}
+				\label{fig:TsRegion}
+			\end{figure}
+
+			\subsubsection{Região de Sobressinal}
+
+			O requisito de sobressinal máximo ($PSS \le 5\%$) impõe uma restrição sobre o coeficiente de amortecimento $\zeta$. Utilizando a relação analítica:
+
+			\begin{equation}
+				\zeta \ge \frac{|\ln(PSS)|}{\sqrt{\pi^2 + \ln^2(PSS)}}
+			\end{equation}
+
+			Para $PSS = 0,05$, tem-se:
+
+			\begin{equation}
+				\zeta \ge 0.6901
+			\end{equation}
+
+			Geometricamente, isso define um cone no plano complexo delimitado pelo ângulo $\phi$ em relação ao 
+			eixo real negativo:
+
+			\begin{equation}
+				\phi = \arccos(\zeta) = \arccos(0.6901) \approx 46,36^\circ
+			\end{equation}
+
+			Portanto, os polos de malha fechada devem possuir um ângulo tal que $0 \le \phi \le 46,36^\circ$. A Figura \ref{fig:PSSTSRegion} apresenta a intersecção das regiões que atendem simultaneamente aos requisitos de tempo e sobressinal.
+
+			\begin{figure}[H]
+				\centering
+				\caption{Região de operação válida atendendo a $T_s$ (verde) e $PSS$ (azul).}
+
+				\includegraphics[width=0.9 \textwidth]{img/PSSTSRegion.jpg}
+
+				\textit{\footnotesize Fonte: Do autor}
+				\label{fig:PSSTSRegion}
+			\end{figure}
+
+			\subsubsection{Seleção do Ganho}
+
+			Com base na região válida identificada, determinou-se a faixa de ganhos que mantém os polos dentro do cone de amortecimento. A análise gráfica indica que o sistema atende aos requisitos para:
+
+			\begin{equation}
+				14,3 \le K_p \le 46,4
+			\end{equation}
+
+			A Figura \ref{fig:testesKps} apresenta a simulação da resposta ao degrau para três valores distintos dentro e nas fronteiras desta faixa.
+
+			\begin{figure}[H]
+				\centering
+				\caption{Simulação da resposta ao degrau unitário para diferentes ganhos $K_p$.}
+
+				\includegraphics[width=1 \textwidth]{img/testesKps.jpg}
+
+				\textit{\footnotesize Fonte: Do autor}
+				\label{fig:testesKps}
+			\end{figure}
+
+			A análise das respostas temporais permite as seguintes conclusões:
+
+			\begin{itemize}
+				\item $K_p = 14,3$: Resposta conservadora e superamortecida. Atende aos requisitos, mas é a mais lenta.
+
+				\item $K_p = 46,4$: Resposta no limite da especificação de sobressinal ($PSS \approx 5\%$). 	Embora rápida, apresenta risco de violar os requisitos caso haja incertezas na modelagem da planta.
+
+				\item $K_p = 30,35$: Valor intermediário escolhido para o projeto. Apresenta um excelente 
+				compromisso entre velocidade (acomodação em $< 4s$) e amortecimento (sem sobressinal significativo).
+			\end{itemize}
+
+			Optou-se, portanto, pelo ganho $K_p = 30,35$. Esta escolha confere {\bfseries robustez} ao sistema de 
+			controle, garantindo uma margem de segurança contra incertezas paramétricas (como variações no arrasto 
+			hidrodinâmico) e evitando a saturação excessiva dos propulsores, mantendo o desempenho bem dentro das 
+			especificações de projeto.
+
+		\subsection{Análise Comparativa com Controlador PD}
+
+			A análise realizada na seção anterior demonstrou que um controlador puramente Proporcional ($P$) com 
+			ganho $K_p = 30,35$ é suficiente para garantir a estabilidade e atender aos requisitos de desempenho 
+			($T_s \le 10s$ e $PSS \le 5\%$). No entanto, visando explorar o potencial máximo de desempenho da 
+			planta e atender ao requisito acadêmico de avaliação de controladores da família PID, investiga-se 
+			nesta seção o impacto da adição de um termo derivativo (controlador $PD$).
+
+			Ressalta-se que a ação Integral ($I$) não será considerada, pois a planta do tipo 1 já garante erro 
+			nulo em regime permanente para entradas em degrau. A adição de um integrador neste caso reduziria a 
+			margem de fase e introduziria oscilações desnecessárias.
+
+			A função de transferência do controlador PD é dada por:
+
+			\begin{equation}
+				C(s) = K_p + K_d s = K_d \left(s + \frac{K_p}{K_d} \right)
+			\end{equation}
+
+			A função de transferência de malha fechada resultante, com o zero do controlador em evidência, é:
+
+			\begin{equation}
+				\frac{Z(s)}{Z_{ref}(s)} = \frac{0.0526 K_d(s + z_c)}{s^2 + (2.2105 + 0.0526 K_d) s + 0.0526 K_p}
+			\end{equation}
+			
+			onde $z_c = K_p/K_d$ é a posição do zero introduzido pelo controlador.
+
+			A principal limitação do controlador Proporcional, identificada no Lugar das Raízes original, é que a 
+			parte real dos polos complexos é fixa em $\sigma = -1.11$. Isso impõe um limite físico à velocidade de 
+			acomodação do sistema, tal que:
+			
+			\begin{equation}
+				T_{s_{min}} \approx \frac{4}{|\sigma|} = \frac{4}{1.11} \approx 3.6 s
+			\end{equation}
+
+			A introdução do zero pelo controlador PD altera a assíntota do Lugar das Raízes, atraindo os polos de 
+			malha fechada para a esquerda no plano complexo. Ajustando-se a razão $K_p/K_d = 3$ (zero em $s=-3$), 
+			obtém-se o comportamento ilustrado na Figura \ref{fig:Lugar_das_raizes_PD}.
+
+			\begin{figure}[H]
+				\centering
+				\caption{Alteração do Lugar das Raízes com a introdução de um zero em $s=-3$ (Ação PD).}
+
+				\includegraphics[width=1\textwidth]{img/testePD.jpg}
+
+				\vspace{.5em}
+				\textit{\footnotesize Fonte: Do autor}
+				\label{fig:Lugar_das_raizes_PD}
+			\end{figure}
+
+			Com a ação derivativa, torna-se possível alocar os polos em regiões com parte real muito mais negativa 
+			(por exemplo, $\sigma \approx -4.54$), resultando em um tempo de acomodação drasticamente reduzido:
+			
+			\begin{equation}
+				T_s \approx \frac{4}{4.54} = 0.88 s
+			\end{equation}
+
+			A Figura \ref{fig:Resposta_controlador_PD} apresenta a simulação da resposta temporal para este cenário 
+			agressivo ($K_d = 133$, $K_p = 399$).
+
+			\begin{figure}[H]
+				\centering
+				\caption{Resposta ao degrau com controlador PD sintonizado para alta velocidade ($T_s < 1s$).}
+
+				\includegraphics[width=0.8\textwidth]{img/respostaPD.jpg}
+				
+				\vspace{.5em}
+				\textit{\footnotesize Fonte: Do autor}
+				\label{fig:Resposta_controlador_PD}
+			\end{figure}
+
+			\subsubsection{Seleção Final da Estrutura de Controle}
+			
+			Embora o controlador PD permita tempos de acomodação inferiores a 1 segundo, {\bfseries optou-se pela 
+			utilização do controlador Proporcional (P)} definido na seção anterior ($K_p = 30,35$). Esta decisão de 
+			projeto baseia-se nos seguintes critérios de engenharia:
+
+			\begin{enumerate}
+				\item \textbf{Suficiência:} O tempo de acomodação obtido com o controlador P ($\approx 3.5 s$) já 
+				atende com folga ao requisito de $10 s$.
+
+				\item \textbf{Esforço de Controle:} A resposta extremamente rápida do PD ($0.88 s$) exigiria picos 
+				de corrente elevados nos motores, levando à saturação dos atuadores e invalidando o modelo linear.
+
+				\item \textbf{Imunidade a Ruídos:} A ação derivativa amplifica ruídos de alta frequência 
+				provenientes dos sensores. Em um ambiente subaquático real, isso causaria vibração excessiva nos 
+				propulsores sem benefício prático na dinâmica lenta de profundidade.
+			\end{enumerate}
+			
+			Dessa forma, o controlador proporcional apresenta a melhor relação custo-benefício (complexidade vs. 
+			desempenho) para esta aplicação.
+
+		\subsection{Análise de Resposta em Frequência}
+
+			Com a planta e o controlador definidos, realiza-se a análise da resposta em frequência para avaliar a 
+			estabilidade relativa e a robustez do sistema. Para isso, foram obtidos os Diagramas de Bode da função 
+			de transferência de malha aberta ($L(s)$) e de malha fechada ($H(s)$), considerando o ganho escolhido 
+			$K_p = 30,35$.
+
+			A função de transferência de malha aberta analisada é dada por:
+
+			\begin{equation}
+				L(s) = C(s)G(s) = 30,35 \cdot \frac{0,0526}{s(s + 2,2105)} = \frac{1,596}{s^2 + 2,2105s}
+			\end{equation}
+
+			As Figuras \ref{fig:resposta_em_frequencia_MA} e \ref{fig:resposta_em_frequencia_MF} apresentam, 
+			respectivamente, os diagramas de Bode de malha aberta e fechada obtidos via simulação.
+
+			\begin{figure}[H]
+				\centering
+				\caption{Diagrama de Bode de malha aberta ($L(s)$).}
+
+				\includegraphics[width=1 \textwidth]{img/bodeMA.jpg}
+
+				\vspace{.5em}
+				\textit{\footnotesize Fonte: Do autor}
+				\label{fig:resposta_em_frequencia_MA}
+			\end{figure}
+
+			\begin{figure}[H]
+				\centering
+				\caption{Diagrama de Bode de malha fechada ($H(s)$).}
+
+				\includegraphics[width=1 \textwidth]{img/BodeMF.jpg}
+
+				\vspace{.5em}
+				\textit{\footnotesize Fonte: Do autor}
+				\label{fig:resposta_em_frequencia_MF}
+			\end{figure}
+
+			\subsubsection{Margens de Estabilidade}
+
+			A {\bfseries Margem de Ganho (MG)} é avaliada na frequência de cruzamento de fase ($\omega_{pc}$), 
+			onde a fase atinge $-180^\circ$ \cite{Ogata}. Analisando o diagrama de fase da Figura 
+			\ref{fig:resposta_em_frequencia_MA}, observa-se que, devido à estrutura do sistema (dois polos, um 
+			na origem), a fase tende assintoticamente a $-180^\circ$ quando $\omega \to \infty$, mas nunca cruza 
+			este valor para frequências finitas. Matematicamente:
+
+			\begin{equation}
+				MG_{dB} = -20\log{|L(j\omega_{pc})|} \xrightarrow{\omega_{pc} \to \infty} -20\log{0} \to +\infty \text{ dB}
+			\end{equation}
+
+			A margem de ganho infinita corrobora a análise do Lugar das Raízes, confirmando que o sistema é 
+			estruturalmente estável para qualquer ganho positivo $K_p$.
+
+			A {\bfseries Margem de Fase (MF)} é avaliada na frequência de cruzamento de ganho ($\omega_{gc}$), 
+			onde a magnitude é $0 \text{ dB}$ \cite{Ogata}. Pela inspeção visual do diagrama e cálculo analítico, tem-se 
+			$\omega_{gc} \approx 0,69 \text{ rad/s}$ e uma fase de $\approx -107^\circ$. Portanto:
+
+			\begin{equation}
+				MF = 180^\circ + \phi(\omega_{gc}) = 180^\circ - 107^\circ = 73^\circ
+			\end{equation}
+
+			Este valor elevado de Margem de Fase indica que o sistema em malha fechada é altamente robusto e bem 
+			amortecido (comportamento equivalente a $\zeta \approx MF/100 = 0,73$), o que explica o baixo 
+			sobressinal observado nas simulações temporais.
+
+			Além disso, a Margem de Fase determina a tolerância do sistema a atrasos puros de tempo ($t_{delay}$), 
+			como aqueles introduzidos por processamento digital e sensores:
+
+			\begin{equation}
+				t_{delay_{max}} = \frac{MF_{rad}}{\omega_{gc}} = \frac{73 \cdot \frac{\pi}{180}}{0,69} \approx 1,86 \text{ s}
+			\end{equation}
+
+			O sistema suporta um atraso de até $1,86 \text{ s}$ na malha de controle antes de se tornar instável. 
+			Considerando que os atrasos reais do hardware (sensores e atuadores) são da ordem de milissegundos, a 
+			estabilidade está garantida com ampla margem de segurança.
+
+			\subsubsection{Largura de Banda}
+
+			A {\bfseries Largura de Banda ($\omega_{BW}$)} do sistema em malha fechada 
+			(Figura \ref{fig:resposta_em_frequencia_MF}) é a frequência na qual o ganho cai para $-3 \text{ dB}$ 
+			em relação ao valor DC. O valor obtido foi de aproximadamente $\omega_{BW} \approx 1 \text{ rad/s}$ 
+			($0,16 \text{ Hz}$).
+
+			Esta largura de banda caracteriza a velocidade de resposta do sistema. Ela indica que o AUV consegue 
+			rastrear comandos de referência que variem lentamente (abaixo de $0,16 \text{ Hz}$), mas atua como um 
+			{\bfseries filtro passa-baixas} para frequências superiores. Isso é benéfico para a aplicação, pois o 
+			sistema naturalmente filtra ruídos de alta frequência dos sensores e rejeita perturbações rápidas da 
+			água que a dinâmica inercial do veículo não seria capaz de acompanhar fisicamente, evitando desgaste 
+			desnecessário dos atuadores.
+
+			Abaixo, resumem-se os valores exatos extraídos via software, que validam a análise visual e analítica 
+			realizada:
+
+			\begin{itemize}
+				\item Margem de Ganho (MG): $\infty$ dB
+				\item Margem de Fase (MF): $72,67^\circ$
+				\item Frequência de Cruzamento de Ganho ($\omega_{gc}$): $0,6894 \text{ rad/s}$
+				\item Largura de Banda ($\omega_{BW}$): $0,9783 \text{ rad/s}$
+			\end{itemize}
 
 \section{Conclusão}
 
