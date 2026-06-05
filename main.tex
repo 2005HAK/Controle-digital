@@ -352,7 +352,7 @@
 
 			Portanto, valida-se a hipótese de que um controlador do tipo Proporcional (P) é suficiente para estabilizar a profundidade do veículo. A adição de um termo derivativo (PD) também será explorada posteriormente para verificar como a insersão do termo derivativo afeta o desempenho do sistema.
 
-	\section{Projeto do Controlador}
+	\section{Projeto do Controlador P e PD (Contínuo)}
 
 		\subsection{Definição dos Requisitos de Desempenho}
 
@@ -681,6 +681,94 @@
 				\item Frequência de Cruzamento de Ganho ($\omega_{gc}$): $0,6894 \text{ rad/s}$
 				\item Largura de Banda ($\omega_{BW}$): $0,9783 \text{ rad/s}$
 			\end{itemize}
+
+	\section{Discretização do sistema}
+
+		Toda a analise até este ponto foi feita no mundo continuo, mas isso não pode ser implementado no veículo. Para que a Yvy possa ser efetivamente controlada é necessário discretizar o sistema para que isto possa ser inserido na Raspberry Pi que a controla.
+
+		\subsection{Tempo de amostragem}
+			
+			Para determinar o tempo de amostragem ideal para capturar a dinâmica do sistema foram analisados os seguintes aspectos: constante de tempo do polo mais rapido da planta e a analise da resposta do sistema pelo diagrama de bode quando foi determinada a largura de banda do sistema.
+
+			A partir da equação \ref{eq:ft_final} verifica-se que a planta possui dois polos, um em $s=0$, que é o integrador natural do sistema, e outro em $s=-\frac{B_d}{\vehicleMass} = - 2,2105$. Quanto mais a esquerda do gráfico mais rápido é o polo, portanto o polo em $s=-2.2305$ apresenta a dinamica mais rápida, apresentanto uma consatante de tempo de:
+
+			\begin{equation}
+				\tau_{s2} = \frac{1}{|s_2|} = \frac{1}{2,2105} = 0,4524 s
+				\label{eq:constante_de_tempo_s2}
+			\end{equation}
+
+			Com isto, segundo o teorema de Nyquist o tempo de amostragem deve ser dado por:
+
+			\begin{equation}
+				T_s > 2\tau_{s2}
+			\end{equation}
+
+			Isto, teoricamente garante que não haverá perda de informação ao discretizar o sinal. Apesar disso, uma pratica comum é utilizar um tempo de amostragem entre 10 e 30 vezes menor que a menor constante de tempo da planta. Assim, o tempo de amostragem pela analise dos polos da planta é dado por:
+
+			\begin{equation}
+				0,1 \tau \le T_s \le 0,3 \tau \implies 0,04524s \le T_s \le 0,01508s
+			\end{equation}
+
+			Desta forma a frequência de amostragem deve estar no intervalo:
+
+			\begin{equation}
+				22,1045 Hz \le f_s \le 66,3130 Hz
+			\end{equation}
+
+			Outra forma de avaliar o tempo de amostragem é a partir do diagrama de bode, mais especificamente analisando a largura de banda. Isto ja foi determinado anteriomente para o sistema em malha fechada com o controlador proporcional com $K_p = 30,35$, onde verificou-se que o AUV atua naturalmente como um filtro passa baixas com frequencia de corte $f_c = 0,16 Hz$. Com base nessa frequência, pode-se utilizar o mesmo critério da frequência de amostragem estar entre 10 e 30 vezes este valor, logo:
+
+			\begin{equation}
+				1,6Hz \le f_s \le 4,8Hz
+			\end{equation}
+
+			Assim, é possivel verificar que a dinâmica da planta exige uma frequência de amostragem maior do que a exigida com o controlador proporcional, logo o ideal é a escolha de uma frequência de amostragem que atenda a planta.
+
+			Obviamente, não adianta somente determintar que a frequência de amostragem deve estar dentro daquele intervalo, é necessário verificar se o hardware suporta amostrar os dados nessa velocidade. 
+
+			A pixhawk envia mensagens via protocolo Mavlink constantemente, cada tipo de mensagem carrega algums informações de sensores. Os dados necessarios para o controle de profundidade podem ser obtidos de duas maneiras/mensagens distintas:
+
+			\begin{enumerate}
+				\item \textbf{SCALED\_PRESSURE2:} Nesta mensagem são enviados dados do sensor de pressão em $hPa$ (hectopascal).
+
+				\item \textbf{LOCAL\_POSITION\_NED:} Nesta mensagem são enviados dados de posição em $m$ (metros) em relação a posição inicial do AUV.
+			\end{enumerate}
+
+			O primeiro método exige pegar os dados de pressão e converter profundidade, exigindo processamento na raspberry, já o segundo método o valor de profundidade é repassado diretamente e é baseado tanto no sensor de pressão quanto nos acelerometros e giroscópios, entregando um dado muito mais preciso do que se fosse pelo primeiro método. Visto isto, é melhor a utilização da segunda mensagem. 
+
+			Definido o método, é necessário determinar a velocidade com que esses dados são enviados. Esse é um parametro configurável e, analisando a documentação da pixhawk, as mensagens de \textit{LOCAL\_POSITION\_NED} podem ter uma taxa de envio definida entre 1Hz e 10Hz via firmware da pixhawk, como o Ardupilot, mas esse valor pode ser aumentado até 100Hz enviando uma mensagem de configuração via Mavlink ou acessando o cartão SD e modificando o arquivo de configuração diretamente.
+
+			Para não saturar a comunicação, visto que mais mensagens são enviadas pela pixhawk, e tambem para não estressar demais o processador da mesma, sera utilizada a taxa maxima que o firmware do Ardupilot permite, ou seja, 10Hz.
+
+			Analisando sob a óptica dos polos da planta esse valor esta abaixo do recomendado pela literatura, sendo somente $\approx 5$ vezes menor que a constante de tempo do polo mais rápido, logo a discretização do sistema pode ficar um pouco degradada, mas ainda assim atende ao teorema de Nyquist, garantindo que não haverá perda de informação.
+
+		\subsection{Discretização da planta}
+
+			Determinado o tempo de amostragem é necessário discretizar a planta para que o controlador possa ser implementado digitalmente. Para tanto, a deve-se lembrar que a planta no dominio continuo é dada por:
+
+			\begin{equation}
+				G(s) = \frac{\Delta Z(s)}{\Delta F_{m}(s)} = \frac{1/19}{s(s + 42/19)} = \frac{0,0526}{s(s + 2,2105)}
+			\end{equation}
+
+			Discretizando a planta utilizando as transformadas Z tabeladas:
+
+			\begin{equation}
+				G(z) = \frac{z-1}{z}Z\{\frac{0,0526}{s^2(s+ 2,2105)}\}
+			\end{equation}
+
+			Trabalhando com o termo onde a transformada Z é aplicada tem-se:
+
+			\begin{align}
+				Z\{\frac{0,0526}{s^2(s+ 2,2105)}\}
+				&= \frac{0,0526}{2,2105^2}\left(-\frac{1}{s}+\frac{1}{s + 2,2105} + \frac{2,2105}{s^2}\right) \\
+				&= \frac{0,0526}{2,2105^2}\left(-\frac{z}{z-1} + \frac{z}{z-e^{-0,22105}} + \frac{0,1z}{(z-1)^2}\right) \\
+				&= \frac{0,0526\left(-0,0983z^2+0,1182z\right)}{2,2105^2(z-1)^2(z-e^{-0,22105})}
+			\end{align}
+
+			Substituindo na equação da planta discreta:
+
+			\begin{equation}
+				G(z) = \frac{0,0526\left(-0,0983z+0,1182\right)}{2,2105^2(z-1)(z-e^{-0,22105})}
+			\end{equation}
 
 \section{Conclusão}
 

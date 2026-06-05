@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex main"] 1780482352.62975 "main.aux" "main.bbl" "main" 1780482914.63617 0
+["bibtex main"] 1780515526.16713 "main.aux" "main.bbl" "main" 1780515684.47207 0
   "./referencias.bib" 1780481478 672 ff8749ddf0a54e715e45c2a68f41e293 ""
   "C:/Users/heber/AppData/Local/Programs/MiKTeX/bibtex/bst/bibtex/plain.bst" 1291864736 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "main.aux" 1780482912 7523 2e8055a2aa8cf6089c7c63db821fdc46 "pdflatex"
+  "main.aux" 1780515683 8008 c1526dcfa7def2533f992da9e21c33d6 "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1780482910.20046 "c:/Users/heber/OneDrive/Documentos/Codigos/UFSC/Controle-digital/main.tex" "main.pdf" "main" 1780482914.63757 0
+["pdflatex"] 1780515682.16085 "c:/Users/heber/OneDrive/Documentos/Codigos/UFSC/Controle-digital/main.tex" "main.pdf" "main" 1780515684.47282 0
   "C:/Users/heber/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1762254091 80909 eab91d9745dd2edfd62a31d53cd5fe15 ""
   "C:/Users/heber/AppData/Local/MiKTeX/fonts/pk/ljfour/jknappen/ec/dpi600/ecbx1095.pk" 1762254098 28976 734d6f1e99821027b253304d691494e3 ""
   "C:/Users/heber/AppData/Local/MiKTeX/fonts/pk/ljfour/jknappen/ec/dpi600/ecbx1200.pk" 1762254101 31952 7da9db42b287ab07b4365ed8d7437778 ""
@@ -118,7 +118,7 @@
   "C:/Users/heber/AppData/Local/Programs/MiKTeX/tex/latex/tools/indentfirst.sty" 1749468414 1618 30b01152766afcef2ed8f904cfdd3cc6 ""
   "C:/Users/heber/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "C:/Users/heber/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1729265222 55384 b454dec21c2d9f45ec0b793f0995b992 ""
-  "c:/Users/heber/OneDrive/Documentos/Codigos/UFSC/Controle-digital/main.tex" 1780482907 38129 2337b95f37abe62ddec55d78bb4206d7 ""
+  "c:/Users/heber/OneDrive/Documentos/Codigos/UFSC/Controle-digital/main.tex" 1780515681 44280 4a13f007f423e9d8f140957056f1caf1 ""
   "img/BodeMF.jpg" 1780481478 60049 ca9ec551ed667f7d89db371d201ad938 ""
   "img/PSSTSRegion.jpg" 1780481478 108463 0e89d5eb623afcdadcb5013f4af0f22a ""
   "img/TsRegion.jpg" 1780481478 100048 4be539758ec8ec101e019da73b1c996f ""
@@ -127,11 +127,11 @@
   "img/root_locus_Gs.jpg" 1780481478 43903 579b910ba3926073cb095bd25292fe54 ""
   "img/testePD.jpg" 1780481478 55398 0afb12651116afb1ee21b7772d0717de ""
   "img/testesKps.jpg" 1780481478 68099 622b2d6bad879a8659f0ac9bab22a160 ""
-  "main.aux" 1780482912 7523 2e8055a2aa8cf6089c7c63db821fdc46 "pdflatex"
-  "main.bbl" 1780482353 481 4c524103b390e8481106faded30df74e "bibtex main"
-  "main.out" 1780482912 6062 fbb6ce23d653da8af79b37d969422516 "pdflatex"
-  "main.tex" 1780482907 38129 2337b95f37abe62ddec55d78bb4206d7 ""
-  "main.toc" 1780482913 2781 76918ff8a0debeb8e44f577721dd7c73 "pdflatex"
+  "main.aux" 1780515683 8008 c1526dcfa7def2533f992da9e21c33d6 "pdflatex"
+  "main.bbl" 1780515526 481 4c524103b390e8481106faded30df74e "bibtex main"
+  "main.out" 1780515683 6693 f38fb79fcc13e73ae5363a6b6b0b5ba1 "pdflatex"
+  "main.tex" 1780515681 44280 4a13f007f423e9d8f140957056f1caf1 ""
+  "main.toc" 1780515683 3061 995c951786074ab325c028e01165b0d3 "pdflatex"
   (generated)
   "main.aux"
   "main.log"
