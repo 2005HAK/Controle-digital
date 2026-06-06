@@ -761,14 +761,81 @@
 				Z\{\frac{0,0526}{s^2(s+ 2,2105)}\}
 				&= \frac{0,0526}{2,2105^2}\left(-\frac{1}{s}+\frac{1}{s + 2,2105} + \frac{2,2105}{s^2}\right) \\
 				&= \frac{0,0526}{2,2105^2}\left(-\frac{z}{z-1} + \frac{z}{z-e^{-0,22105}} + \frac{0,1z}{(z-1)^2}\right) \\
-				&= \frac{0,0526\left(-0,0983z^2+0,1182z\right)}{2,2105^2(z-1)^2(z-e^{-0,22105})}
+				&= \frac{0,0526\left(0,02273z^2+0,02111z\right)}{2,2105^2(z-1)^2(z-e^{-0,22105})}
 			\end{align}
 
 			Substituindo na equação da planta discreta:
 
 			\begin{equation}
-				G(z) = \frac{0,0526\left(-0,0983z+0,1182\right)}{2,2105^2(z-1)(z-e^{-0,22105})}
+				G(z) = \frac{0,0526\left(0,02273z+0,02111\right)}{2,2105^2(z-1)(z-e^{-0,22105})}
 			\end{equation}
+
+			Com isto, pode-se verificar que a planta discreta passou a ter um zero que não existia na planta contínua. Plotando o Lugar das Raízes da planta discreta, é possível verificar que a planta ja não é mais estável para qualquer ganho positivo como era antes, visto que o zero esta puxando os polos para fora do circulo unitário, como ilustrado na Figura \ref{fig:Lugar_das_raizes_Gz_10hz}.
+
+			\begin{figure}[H]
+				\centering
+				\caption{Lugar das Raízes da planta discreta $G(z)$.}
+
+				\includegraphics[width=0.9 \textwidth]{img/LugarDasRaizesGz10hz.jpeg}
+
+				\vspace{.5em}
+				\textit{\footnotesize Fonte: Do autor}
+				\label{fig:Lugar_das_raizes_Gz_10hz}
+			\end{figure}
+
+			Como é possivel verificar graficamente, a planta discreta com $T_s=0,1s$ possui um zero em $z=-0,9287$ o que faz com que a planta so seja estável para ganhos na faixa de $0 < K_p \le 754$. Outro teste que pode ser feito é verificar o efeito de subir a frequência de amostragem para $T_s=0.015s$ que é quase 30 vezes menor que a constante de tempo do polo mais rápido e um valor que não deve estressar demais o hardware.
+
+			\begin{figure}[H]
+				\centering
+				\caption{Lugar das Raízes da planta discreta $G(z)$ com $T_s=0,015s$.}
+
+				\includegraphics[width=0.9 \textwidth]{img/LugarDasRaizesGz66hz.jpeg}
+
+				\vspace{.5em}
+				\textit{\footnotesize Fonte: Do autor}
+				\label{fig:Lugar_das_raizes_Gz_66hz}
+			\end{figure}
+
+			Com esta frequência de amostragem é possivel verificar que o ganho aceito pela planta discreta é muito maior, ficando na faixa de $0 < K_p \le 5120$.
+		
+		\subsection{Controlador Proporcional}
+
+			Com a planta discretizada, o controlador proporcional também deve ser discretizado para que possa ser implementado digitalmente. A função de transferência do controlador proporcional é dada por:
+
+			\begin{equation}
+				C(s) = K_p
+			\end{equation}
+
+			Discretizando o controlador utilizando a transformada Z tabelada:
+
+			\begin{equation}
+				C(z) = Z\{K_p\} = K_p
+			\end{equation}
+
+			Portanto, o controlador proporcional é invariante à discretização, ou seja, a função de transferência do controlador permanece a mesma tanto no domínio contínuo quanto no domínio discreto. Logo, o valor de $K_p$ escolhido para o controlador proporcional no domínio contínuo ($K_p = 30,35$) pode ser mantido para a implementação digital, desde que seja verificado que este valor se encaixa na faixa de ganhos permitida pela planta discretizada, o que é o caso para ambas as frequências de amostragem analisadas.
+			Deste modo, plotando a resposta ao degrau do sistema em malha fechada com o controlador proporcional em ambos os casos, com $10Hz$ e $66Hz$, é possível verificar que o sistema continua atendendo aos requisitos de desempenho definidos.
+
+			\begin{figure}[H]
+				\centering
+				\caption{Resposta ao degrau do sistema em malha fechada com controlador proporcional e $T_s=0,1s$.}
+
+				\includegraphics[width=0.8 \textwidth]{img/RespostaDegrau10hz.jpeg}
+
+				\vspace{.5em}
+				\textit{\footnotesize Fonte: Do autor}
+				\label{fig:resposta_degrau_10hz}
+			\end{figure}
+
+			\begin{figure}[H]
+				\centering
+				\caption{Resposta ao degrau do sistema em malha fechada com controlador proporcional e $T_s=0,015s$.}
+
+				\includegraphics[width=0.8 \textwidth]{img/RespostaDegrau66hz.jpeg}
+
+				\vspace{.5em}
+				\textit{\footnotesize Fonte: Do autor}
+				\label{fig:resposta_degrau_66hz}
+			\end{figure}
 
 \section{Conclusão}
 
