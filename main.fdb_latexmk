@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex main"] 0 "main.aux" "main.bbl" "main" 1780757597.4306 -1
+["bibtex main"] 1780842786.96675 "main.aux" "main.bbl" "main" 1780843139.51534 0
   "./referencias.bib" 1780445265.49354 672 1b1f5d53d5d6628aeebb5528f4b3e787 ""
   "/usr/share/texlive/texmf-dist/bibtex/bst/base/plain.bst" 1292289607 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "main.aux" 1780757597.3496 9410 524a534d3b0383ab94f45e47adb60f7c "pdflatex"
+  "main.aux" 1780843139.4346 9541 6678828e54584ea6d478b1aa2e5ed202 "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1780757596.89679 "/media/hak/HD1TB/Documentos/Hebert_Alan_Kubis/Repositorios/UFSC/controle-digital/main.tex" "main.pdf" "main" 1780757597.43078 0
+["pdflatex"] 1780843138.97596 "/media/hak/HD1TB/Documentos/Hebert_Alan_Kubis/Repositorios/UFSC/controle-digital/main.tex" "main.pdf" "main" 1780843139.51553 0
   "/etc/texmf/web2c/texmf.cnf" 1765492615.82701 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/hak/.texlive2025/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1095.600pk" 1779658789.24804 28952 50d684f26035403c9d9697900e9bdd02 ""
   "/home/hak/.texlive2025/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1200.600pk" 1771159778.6264 31928 2ecadfe4aca16aa0a18b9fc3148c7860 ""
@@ -16,7 +16,7 @@
   "/home/hak/.texlive2025/texmf-var/fonts/pk/ljfour/jknappen/ec/ecti1000.600pk" 1779658788.37205 31872 c347f3ec5e76fc8342f0afcf81f90f6d ""
   "/home/hak/.texlive2025/texmf-var/fonts/pk/ljfour/jknappen/ec/ecti1200.600pk" 1771159778.3464 39096 6b38e9c914d5fda7d1729cffb98f87f1 ""
   "/home/hak/.texlive2025/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1200.600pk" 1771159778.8384 14040 88f53cadd759dc938f7df9ba668a1ad7 ""
-  "/media/hak/HD1TB/Documentos/Hebert_Alan_Kubis/Repositorios/UFSC/controle-digital/main.tex" 1780757551.29373 46945 b442312c5dc65e7c0f96c35576bf5a76 ""
+  "/media/hak/HD1TB/Documentos/Hebert_Alan_Kubis/Repositorios/UFSC/controle-digital/main.tex" 1780843138.41861 47605 6d30f4ae5c91f8d65a3c7505bdec7d08 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1095.tfm" 1136768653 3584 21b378cca2e40816b0e6d74a4dc98f04 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1200.tfm" 1136768653 3584 402da0b29eafbad07963b1224b222f18 ""
@@ -135,11 +135,11 @@
   "img/root_locus_Gs.jpg" 1763746392.57853 43903 579b910ba3926073cb095bd25292fe54 ""
   "img/testePD.jpg" 1763759584.78753 55398 2afe2d49e0f7c20326d5c7dcf70d606a ""
   "img/testesKps.jpg" 1763755137.98915 68099 e7a0d79048b4f8289236aa64a9d96dd8 ""
-  "main.aux" 1780757597.3496 9410 524a534d3b0383ab94f45e47adb60f7c "pdflatex"
-  "main.bbl" 1780757488.17789 460 4c524103b390e8481106faded30df74e "bibtex main"
-  "main.out" 1780757597.3496 6874 14512c1861eadf4b4af20d7addd5d5d6 "pdflatex"
-  "main.tex" 1780757551.29373 46945 b442312c5dc65e7c0f96c35576bf5a76 ""
-  "main.toc" 1780757597.3496 3152 f34b012a5d1fe4381a52dfc3e66ba42d "pdflatex"
+  "main.aux" 1780843139.4346 9541 6678828e54584ea6d478b1aa2e5ed202 "pdflatex"
+  "main.bbl" 1780842786.976 460 4c524103b390e8481106faded30df74e "bibtex main"
+  "main.out" 1780843139.4386 7043 beeb48c4ea45ac1be27e989ad7903e4c "pdflatex"
+  "main.tex" 1780843138.41861 47605 6d30f4ae5c91f8d65a3c7505bdec7d08 ""
+  "main.toc" 1780843139.4386 3242 bb8a890376ac4784b713c0db8085362b "pdflatex"
   (generated)
   "main.aux"
   "main.log"

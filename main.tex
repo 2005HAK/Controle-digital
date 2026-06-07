@@ -352,7 +352,7 @@
 
 			Portanto, valida-se a hipótese de que um controlador do tipo Proporcional (P) é suficiente para estabilizar a profundidade do veículo. A adição de um termo derivativo (PD) também será explorada posteriormente para verificar como a insersão do termo derivativo afeta o desempenho do sistema.
 
-	\section{Projeto do Controlador P e PD (Contínuo)}
+	\section{Projeto do Controlador P e PD}
 
 		\subsection{Definição dos Requisitos de Desempenho}
 
@@ -837,6 +837,10 @@
 				\label{fig:resposta_degrau_66hz}
 			\end{figure}
 
+		\subsection{Controlador Proporcional-Derivativo}
+
+			Na seção anterior foi demostrado que o controlador proporcional é suficiente para atender aos requisitos de desempenho da planta. De todo modo, no dominio continuo tambem foi implementado um controlador PD a fim de comparar o desempenho com o controlador proporcional, portanto esse mesmo controlador será discretizado para analisar seu desempenho no dominio discreto. Relembrando que não foi implementado um controlador PID por conta do integrador intrinscico na planta, o que ja garante erro nulo em regime permanente para entradas em degrau e a adição de um integrador no controlador tornaria o sistema 
+
 \section{Conclusão}
 
 	O presente trabalho abordou o desenvolvimento completo do sistema de controle de profundidade para o AUV Yvy, abrangendo desde a modelagem física até a validação do controlador em frequência. A obtenção do modelo matemático linearizado, fundamentado na física do arrasto hidrodinâmico e nos parâmetros reais do veículo, revelou uma planta de segunda ordem do Tipo 1, intrinsecamente capaz de anular erros de regime para entradas em degrau.
@@ -844,6 +848,8 @@
 	A definição rigorosa dos requisitos de desempenho, priorizando a segurança operacional (sobressinal limitado a 5\%), guiou o projeto do controlador pelo método do Lugar das Raízes. A análise comparativa entre as estratégias de controle demonstrou que, embora a ação derivativa (PD) permitisse tempos de resposta inferiores a 1 segundo, tal agressividade implicaria em esforços de controle excessivos e sensibilidade a ruídos. Portanto, concluiu-se que o controlador puramente \textbf{Proporcional (P)}, com ganho ajustado para $K_p = 30,35$, representa a solução mais equilibrada, garantindo um tempo de acomodação satisfatório ($T_s \approx 3,5$ s) e robustez contra incertezas de modelagem.
 
 	Por fim, a análise da resposta em frequência validou a estabilidade e a robustez do projeto. O sistema apresentou Margem de Ganho infinita e uma Margem de Fase elevada ($\approx 73^\circ$), o que assegura um comportamento bem amortecido e tolerância a atrasos de transporte superiores a 1,8 segundos. A largura de banda obtida ($\approx 1$ rad/s) confirmou que o sistema de malha fechada atuará efetivamente no rastreamento de trajetórias de profundidade, filtrando naturalmente perturbações de alta frequência e ruídos de sensores, atendendo assim a todos os objetivos de engenharia propostos para a operação do AUV Yvy.
+
+
 
 	\clearpage
 	\bibliographystyle{plain}
