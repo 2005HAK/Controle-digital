@@ -2,8 +2,8 @@ clear; close all; clc;
 
 % --- 1. Definição do Sistema ---
 s = tf("s");
-G_s = (0.0526)/(s^2 + 2.2105*s);
-Kp = 30.35;
+G_s = (0.0526)/(s^2 + 0.8842*s);
+Kp = 3.72;
 
 % --- 2. Malha Aberta (L) ---
 % A análise de estabilidade (Margens) é feita na MALHA ABERTA!

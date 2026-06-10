@@ -276,36 +276,37 @@
 			\begin{itemize}
 				\item Massa do veículo ($\vehicleMass$): 19 kg;
 
-				\item Volume deslocado ($\vehicleVolume$): 0.014 m$^3$;
+				\item Volume deslocado ($\vehicleVolume$): 0,014 m$^3$;
 
 				\item Densidade do fluido ($\rho$): 1000 kg/m$^3$ (água doce);
 
-				\item Aceleração da gravidade ($g$): 9.81 m/s$^2$.
+				\item Aceleração da gravidade ($g$): 9,81 m/s$^2$.
 			\end{itemize}
 
 			A massa foi obtida experimentalmente utilizando uma balança de precisão no Laboratório de Interação Fluido-Estrutura (LIFE) da \universidade. O volume foi extraído diretamente do modelo CAD do veículo (software SolidWorks).
 
 				\subsubsection{Coeficiente de Amortecimento Hidrodinâmico}
 
-					A determinação do coeficiente de arrasto linearizado ($B_d$) requer uma análise da hidrodinâmica do veículo. Dada a geometria complexa do AUV, adotou-se a aproximação de um corpo rombudo (cubo) de aresta $L = 0.4$ m, compatível com as dimensões reais de $0.38 \times 0.4 \times 0.38$ m.	
+					A determinação do coeficiente de arrasto linearizado ($B_d$) requer uma análise da hidrodinâmica do veículo. Dada a geometria complexa do AUV, adotou-se a aproximação de um corpo rombudo (cubo) de aresta $L = 0,4$ m, compatível com as dimensões reais de $0,38 \times 0,4 \times 0,38$ m.	
 
-					Primeiramente, validou-se a hipótese de regime turbulento. Calculou-se o Número de Reynolds ($Re$) considerando uma velocidade baixa de $v = 0.1$ m/s, representando o início do movimento, e viscosidade dinâmica da água $\mu = 0.001$ Pa.s:
-
-					\begin{equation}
-						Re = \frac{\rho \cdot v \cdot L}{\mu} = \frac{1000 \cdot 0.1 \cdot 0.4}{0.001} = 40.000
-					\end{equation}
-
-					Como $Re \gg 10^4$ mesmo em baixas velocidades, confirma-se que o escoamento é predominantemente turbulento, validando o uso de um coeficiente de arrasto constante $C_d \approx 1.05$ para geometria cúbica conforme tabela 9.3 em Fox et al. \cite{FoxMcDonald}.
-
-					No entanto, a equação dinâmica linearizada (Eq. \ref{eq:dinamica_linearizada}) exige um coeficiente de amortecimento linear ($B_d$), enquanto o arrasto físico é quadrático ($F_d \propto v^2$). Para contornar isso, realizou-se a linearização da força de arrasto em torno de uma velocidade de operação nominal $v_{op} = 0.5$ m/s. Este valor foi definido com base na análise de AUVs de porte similar, como o BlueROV2 \cite{bluev2} e o BBAUV 4.5 \cite{bbauv4.5}.
-
-					A equivalência de forças no ponto de operação é dada por:
+					Primeiramente, validou-se a hipótese de regime turbulento. Calculou-se o Número de Reynolds ($Re$) considerando uma velocidade baixa de $v = 0,1$ m/s, representando o início do movimento, e viscosidade dinâmica da água $\mu = 0,001$ Pa.s:
 
 					\begin{equation}
-						F_{d_{linear}} = F_{d_{quadratico}} \implies B_d \cdot v_{op} = \frac{1}{2} \rho \cdot v_{op}^2 \cdot C_d \cdot A
+						Re = \frac{\rho \cdot v \cdot L}{\mu} = \frac{1000 \cdot 0,1 \cdot 0,4}{0,001} = 40,000
 					\end{equation}
 
-					Onde $A = 0.16$ m$^2$ é a área da seção transversal ($0.4 \times 0.4$ m). Isolando $B_d$:
+					Como $Re \gg 10^4$ mesmo em baixas velocidades, confirma-se que o escoamento é predominantemente turbulento, validando o uso de um coeficiente de arrasto constante $C_d \approx 1,05$ para geometria cúbica conforme tabela 9.3 em Fox et al. \cite{FoxMcDonald}.
+
+					No entanto, a equação dinâmica linearizada (Eq. \ref{eq:dinamica_linearizada}) exige um coeficiente de amortecimento linear ($B_d$), enquanto o arrasto físico é quadrático ($F_d \propto v^2$). Para contornar isso, realizou-se a linearização da força de arrasto em torno de uma velocidade de operação nominal $v_{op} = 0,2$ m/s, sendo este valor foi definido a partir da velocidade terminal do AUV. Sabendo que em conjunto, os motores que controlam o movimento vertical são capazes de entregar aproximadamente $35N$ de força, assim assumiu-se o veículo em velocidade terminal, onde a aceleração é nula e as forças de propulsão e arrasto se equilibram, e fez-se a seguinte substituição na equação de equilíbrio de forças \ref{eq:dinamica_nao_linear}:
+
+					\begin{equation}
+						F_{d_{linear}} = F_{d_{quadratico}} \implies B_d \cdot \frac{dz}{dt} = \frac{1}{2} \rho \cdot v_{op}^2 \cdot C_d \cdot A
+						\label{eq:linearizacao_arrasto}
+					\end{equation}
+
+					Onde $A = 0,16$ m$^2$ é a área da seção transversal ($0,4 \times 0,4$ m). Com isso foi possivel determinar a velocidade terminal $v_{term} = 0,4090$ m/s e se estabeleceu que a velocidade de operação nominal para linearização seria cerca de 50\% da terminal $v_{op} = 0,2$ m/s, garantindo que o modelo linearizado seja válido em torno da região de operação do veículo.
+
+					Encontrada a velocidade de operação, a linearização da força de arrasto é realizada utilizando a expressão derivada da equação \ref{eq:linearizacao_arrasto}:
 
 					\begin{equation}
 						B_d = \frac{1}{2} \rho \cdot v_{op} \cdot C_d \cdot A
@@ -314,21 +315,21 @@
 					Substituindo os valores:
 
 					\begin{equation}
-						B_d = 0.5 \cdot 1000 \cdot 0.5 \cdot 1.05 \cdot 0.16 = 42 \text{ kg/s (ou Ns/m)}
+						B_d = \frac{1}{2} \cdot 1000 \cdot 0,2 \cdot 1,05 \cdot 0,16 = 16,8 \text{ kg/s (ou Ns/m)}
 					\end{equation}
 
-					Ressalta-se que o coeficiente $B_d$ calculado é uma aproximação válida nas vizinhanças da velocidade de operação ($0.5$ m/s). Velocidades verticais significativamente superiores resultarão em forças de arrasto maiores do que as previstas pelo modelo linear (amortecimento subestimado), enquanto velocidades inferiores resultarão em forças menores (amortecimento superestimado). O controlador deve, portanto, apresentar robustez suficiente para lidar com essas variações paramétricas.
+					Ressalta-se que o coeficiente $B_d$ calculado é uma aproximação válida nas vizinhanças da velocidade de operação ($0,2$ m/s). Velocidades verticais significativamente superiores resultarão em forças de arrasto maiores do que as previstas pelo modelo linear (amortecimento subestimado), enquanto velocidades inferiores resultarão em forças menores (amortecimento superestimado). O controlador deve, portanto, apresentar robustez suficiente para lidar com essas variações paramétricas.
 
 		\subsection{Análise de Estabilidade e Lugar das Raízes}
 
-			Substituindo os parâmetros físicos determinados na seção anterior ($M_t = 19$ kg e $B_d = 42$ kg/s) na equação da planta, obtém-se a função de transferência numérica do sistema:
+			Substituindo os parâmetros físicos determinados na seção anterior ($M_t = 19$ kg e $B_d = 16.8$ kg/s) na equação da planta, obtém-se a função de transferência numérica do sistema:
 
 			\begin{equation}
-				G(s) = \frac{\Delta Z(s)}{\Delta F_{m}(s)} = \frac{1/19}{s(s + 42/19)} = \frac{0,0526}{s(s + 2,2105)}
+				G(s) = \frac{\Delta Z(s)}{\Delta F_{m}(s)} = \frac{1/19}{s(s + 16,8/19)} = \frac{0,0526}{s(s + 0,8842)}
 				\label{eq:ft_numerica}
 			\end{equation}
 
-			A análise dos polos de malha aberta revela raízes em $s_1 = 0$ e $s_2 = -2,2105$. A presença do polo na origem confirma que o sistema é {\bfseries marginalmente estável} em malha aberta, comportando-se como um integrador com amortecimento.
+			A análise dos polos de malha aberta revela raízes em $s_1 = 0$ e $s_2 = -0,8842$. A presença do polo na origem confirma que o sistema é {\bfseries marginalmente estável} em malha aberta, comportando-se como um integrador com amortecimento.
 
 			Para avaliar o comportamento do sistema em malha fechada sob ação de controle, traçou-se o Lugar das Raízes (Root Locus) utilizando o software MATLAB, conforme apresentado na Figura \ref{fig:root_locus_Gs}.
 
@@ -347,7 +348,7 @@
 			\begin{enumerate}
 				\item {\bfseries Estabilidade Absoluta:} Os ramos do lugar das raízes permanecem inteiramente no semiplano esquerdo complexo para qualquer ganho $K > 0$. Isso indica que o sistema em malha fechada é {\bfseries incondicionalmente estável} com um controlador Proporcional.
 
-				\item {\bfseries Comportamento Dinâmico:} Para ganhos baixos, o sistema apresenta polos reais distintos (superamortecido). À medida que o ganho aumenta, os polos convergem para o ponto de separação (em $s \approx -1,105$) e tornam-se complexos conjugados, resultando em uma resposta subamortecida (oscilatória).
+				\item {\bfseries Comportamento Dinâmico:} Para ganhos baixos, o sistema apresenta polos reais distintos (superamortecido). À medida que o ganho aumenta, os polos convergem para o ponto de separação (em $s \approx -0,442$) e tornam-se complexos conjugados, resultando em uma resposta subamortecida (oscilatória).
 			\end{enumerate}
 
 			Portanto, valida-se a hipótese de que um controlador do tipo Proporcional (P) é suficiente para estabilizar a profundidade do veículo. A adição de um termo derivativo (PD) também será explorada posteriormente para verificar como a insersão do termo derivativo afeta o desempenho do sistema.
@@ -362,7 +363,7 @@
 
 				A limitação do Percentual de Sobressinal (PSS) é o requisito mais crítico deste projeto, justificado estritamente pela \textbf{segurança operacional e integridade física do veículo}.
 
-				Considerando um cenário operacional onde o AUV deve realizar manobras próximas ao leito marinho ou ao fundo de um tanque de testes, um sobressinal excessivo pode resultar em colisão. Por exemplo, assuma-se uma manobra de descida onde o veículo parte de $z_{ini} = 1,0 \text{ m}$ para uma referência $z_{ref} = 5,0 \text{ m}$, em um local onde a profundidade total é $z_{solo} = 5,1 \text{ m}$.
+				Considerando um cenário operacional onde o AUV deve realizar manobras próximas ao leito marinho ou ao fundo de um tanque de testes, um sobressinal excessivo pode resultar em colisão. Por exemplo, assuma-se uma manobra de descida onde o veículo parte de $z_{ini} = 1,0 \text{ m}$ para uma referência $z_{ref} = 5,0 \text{ m}$, em um local onde a profundidade total é $z_{solo} = 5,2 \text{ m}$.
 
 				Neste caso, a variação de profundidade é:
 
@@ -376,12 +377,12 @@
 					z_{pico} = z_{ref} + \left(\Delta z \cdot \frac{PSS}{100}\right) = 5,0 + (4,0 \cdot 0,05) = 5,2 \text{ m}
 				\end{equation}
 
-				Neste cenário hipotético, o veículo tentaria atingir 5,2 m, colidindo inevitavelmente com o solo em 5,1 m. Tal impacto, mesmo em baixa velocidade, pode danificar sensores críticos (DVL, sonar, câmeras) e levantar sedimentos que prejudicam a navegação visual.
+				Neste cenário hipotético, o veículo tentaria atingir 5,2 m, o que poderia resultar em uma colisão com o solo. Tal impacto, mesmo em baixa velocidade, pode danificar sensores críticos (DVL, sonar, câmeras) e levantar sedimentos que prejudicam a navegação visual.
 
 				Portanto, define-se como requisito estrito que:
 
 				\begin{equation}
-					PSS \le 5\%
+					PSS = 5\%
 				\end{equation}
 
 				Adicionalmente, recomenda-se como regra de segurança que a referência de profundidade nunca exceda $95\%$ da profundidade máxima local ($z_{ref} \le 0,95 \cdot h_{max}$).
@@ -390,13 +391,13 @@
 
 				O tempo de acomodação ($T_s$) define a rapidez de resposta do sistema. Para estipular um valor factível, deve-se considerar a limitação física de velocidade do atuador e do arrasto hidrodinâmico.
 
-				Retomando o cenário de uma variação de profundidade de $\Delta z = 4 \text{ m}$ e considerando a velocidade de operação linearizada do modelo, $v_{op} = 0,5 \text{ m/s}$, o tempo mínimo de trânsito físico ($T_{transito}$) é:
+				Assumindo que o veículo varie sua profundidade em $\Delta z = 1 \text{ m}$ e que a velocidade de operação linearizada do modelo é $v_{op} = 0.2 \text{ m/s}$, o tempo mínimo de trânsito físico ($T_{transito}$) para percorrer essa variação é:
 
 				\begin{equation}
-					T_{transito} = \frac{\Delta z}{v_{op}} = \frac{4}{0,5} = 8 \text{ s}
+					T_{transito} = \frac{\Delta z}{v_{op}} = \frac{1}{0,2} = 5 \text{ s}
 				\end{equation}
 
-				Como o sistema dinâmico necessita de um tempo adicional para desacelerar e estabilizar na referência (entrar na faixa de erro de 2\%), define-se uma margem de 2 segundos sobre o tempo de trânsito. Assim, o requisito de desempenho temporal é estabelecido como:
+				Como o sistema dinâmico necessita de um tempo adicional para acelerar, desacelerar e entrar na margem de 2\% do valor final, define-se uma margem de 100\% do tempo de transito do AUV para se deslocar $1 \text{ m}m$. Assim, o requisito de desempenho temporal é estabelecido como:
 
 				\begin{equation}
 					T_s \le 10 \text{ s} \quad \text{(critério de 2\%)}
@@ -419,13 +420,13 @@
 			A função de transferência de malha fechada para o controlador proporcional é dada por:
 
 			\begin{equation}
-				\frac{\Delta Z(s)}{\Delta Z_{ref}(s)} = \frac{0.0526 K_p}{s^2 + 2.2105s + 0.0526 K_p}
+				\frac{\Delta Z(s)}{\Delta Z_{ref}(s)} = \frac{0,0526 K_p}{s^2 + 0,8842s + 0,0526 K_p}
 			\end{equation}
 
 			Comparando o denominador com a forma padrão de segunda ordem ($s^2 + 2\zeta\omega_n s + \omega_n^2$), identificam-se as relações:
 
 			\begin{equation}
-				\omega_n^2 = 0.0526K_p \quad \text{e} \quad 2 \zeta \omega_n = 2.2105
+				\omega_n^2 = 0,0526K_p \quad \text{e} \quad 2 \zeta \omega_n = 0,8842
 				\label{eq:params_mf}
 			\end{equation}
 
@@ -434,16 +435,16 @@
 			O requisito de tempo de acomodação ($T_s \le 10$ s, critério de 2\%) impõe uma restrição sobre a parte real dos polos ($\sigma = \zeta\omega_n$):
 
 			\begin{equation}
-				T_s \approx \frac{4}{\zeta \omega_n} \le 10 \implies \zeta \omega_n \ge 0.4
+				T_s \approx \frac{4}{\zeta \omega_n} \le 10 \implies \zeta \omega_n \ge 0,4
 			\end{equation}
 
 			Como os polos estáveis possuem parte real negativa, a condição no plano complexo é:
 
 			\begin{equation}
-				\text{Re}(s) \le -0.4
+				\text{Re}(s) \le -0,4
 			\end{equation}
 
-			Observando o Lugar das Raízes, nota-se que a parte real dos polos complexos é fixa em $-1.105$ (metade da soma dos polos de malha aberta). Como $-1.105 < -0.4$, o requisito de tempo de acomodação é {\bfseries naturalmente satisfeito para qualquer ganho} que resulte em polos complexos, conforme ilustrado na Figura \ref{fig:TsRegion}.
+			Observando o Lugar das Raízes, nota-se que a parte real dos polos complexos é fixa em $-0,422$. Como $-0,422 < -0,4$, o requisito de tempo de acomodação é {\bfseries naturalmente satisfeito para qualquer ganho} que resulte em polos complexos, conforme ilustrado na Figura \ref{fig:TsRegion}.
 
 			\begin{figure}[H]
 				\centering
@@ -488,6 +489,8 @@
 				\label{fig:PSSTSRegion}
 			\end{figure}
 
+			% ------------- Acho que essa parte vai sair ------------------- %
+
 			\subsubsection{Seleção do Ganho}
 
 			Com base na região válida identificada, determinou-se a faixa de ganhos que mantém os polos dentro do cone de amortecimento. A análise gráfica indica que o sistema atende aos requisitos para:
@@ -523,6 +526,67 @@
 			controle, garantindo uma margem de segurança contra incertezas paramétricas (como variações no arrasto 
 			hidrodinâmico) e evitando a saturação excessiva dos propulsores, mantendo o desempenho bem dentro das 
 			especificações de projeto.
+		
+		% ------------- ^ Acho que essa parte vai sair ^ ------------------- %
+
+		\subsection{Controlador PID}
+
+			Apesar de ter sido constatado que um controlador Proporcional é suficiente para estabilizar o sistema e atender aos requisitos de desempenho, a utilização de um PID será necessária para a implementação prática, visto que o AUV possui flutuabilidade positiva, o que implica que a força de empuxo força o AUV a subir. Assim, um controlador proporcional puro, na prática, não seria capaz de manter o veículo na profundidade desejada, ele sepre estaria com um erro em relação a referência para que ele se mantenha em equilibrio. 
+
+			Na realidade o que seria necessário é somente um integrador no controlador para que o erro seja acumulado e o AUV estabilize na referência desejada, mas a insersão do integrador toranara o sistema mais oscilatório, por isso optou-se por um controlador PID.
+
+			O controlador PID é definido pela seguinte função de transferência:
+
+			% ------------------ Continuar daqui ------------------ %
+
+			\begin{equation}
+				C(s) = K_p + \frac{K_i}{s} + K_d s
+			\end{equation}
+
+			Aplicando o controlador na planta tem-se:
+
+			\begin{equation}
+				
+			\end{equation}
+
+			A função de transferência tambem pode ser reescrita para evidenciar os zeros do controlador:
+
+			\begin{equation}
+				C(s) = \frac{K_d s^2 + K_p s + K_i}{s} = \frac{K\left(s + a + jb\right)\left(s + a - jb\right)}{s}
+				\label{eq:pidzeros}
+			\end{equation}
+
+			Com isso pode-se inserir os dois zeros do controlador logo acima do polo de malha aberta, em $s=-0,8842$, e abaixo da região de sobressinal, ou seja, a parte imaginaria deve ser menor que $2,318$ (valor retirado do Lugar das Raízes). Com o intuito de manter os polos de malha fechada dentro da região definida pelos requisitos de desempenho, optou-se por posicionar os zeros em $s = -0,8842 \pm 0,1$, logo, pela equação \ref{eq:pidzeros} tem-se $a=-0,8842$ e $b=0,1$. Com isso, pode-se calcular os ganhos $K_p$, $K_i$ e $K_d$ a partir da relação entre os coeficientes do numerador do controlador e os zeros escolhidos:
+
+			\begin{equation}
+				K_p = K \cdot 2a = 4,210K
+			\end{equation}
+
+			\begin{equation}
+				K_i = K \cdot (a^2 + b^2) = 4,4410K
+			\end{equation}
+
+			\begin{equation}
+				K_d = K
+			\end{equation}
+
+			\begin{equation}
+				K_d = K
+			\end{equation}
+
+			Determiniando, arbitrariamente, $K_d = 1$, tem-se $K_p = -4,210$ e $K_i = 4,4410$. A simulação da resposta ao degrau para este controlador PID é apresentada na Figura \ref{fig:Resposta_controlador_PID}.
+
+			\begin{figure}[H]
+				\centering
+				\caption{Resposta ao degrau com controlador PID.}
+
+				%\includegraphics[width=0.8\textwidth]{img/respostaPID.jpg}
+
+				\vspace{.5em}
+				\textit{\footnotesize Fonte: Do autor}
+				\label{fig:Resposta_controlador_PID}
+			\end{figure}
+
 
 		\subsection{Análise Comparativa com Controlador PD}
 

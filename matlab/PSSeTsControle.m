@@ -2,8 +2,14 @@ clear; close all; clc;
 
 % --- 1. Definição do Sistema ---
 s = tf("s");
+%K_p = 2.0421;
+%K_i = 0.8989;
+%K_d = 1;
+
+%C_s = (K_d * s^2 + K_p * s + K_i)/(s);
+
 % Parâmetros da planta do AUV
-G_s = (0.0526)/(s^2 + 2.2105*s);
+G_s = (0.0526)/(s^2 + 0.8842*s);
 
 % --- 2. Definição dos Requisitos ---
 % Requisito de Tempo: Ts <= 10s -> Re(s) <= -0.4

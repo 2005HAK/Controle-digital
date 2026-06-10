@@ -16,7 +16,7 @@ angulo_rad = acos(zeta_min); % Ângulo em radianos a partir do eixo real negativ
 % Quanto mais longe da origem, menos efeito ele tem.
 % Quanto mais perto, mais ele "puxa" os polos para a esquerda (mais rápido).
 
-zero_pd = 3; % Exemplo: Vamos colocar o zero em s = -1.5
+zero_pd = 5; % Exemplo: Vamos colocar o zero em s = -1.5
 % Isso significa que a razão Kp/Kd será 1.5
 
 % A nova "planta equivalente" para o lugar das raizes é G(s) * (s + z)
@@ -76,7 +76,7 @@ hold off;
 % --- 8. Validação Temporal (Pós-Gráfico) ---
 % Suponha que você clicou no gráfico e achou um Ganho (Kd) = 20 (exemplo!)
 % Troque 20 pelo valor que você achou:
-Kd_escolhido = 133; 
+Kd_escolhido = 5.83; 
 Kp_calculado = Kd_escolhido * zero_pd;
 
 % Monta o controlador

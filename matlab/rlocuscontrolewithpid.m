@@ -1,9 +1,16 @@
 clear; close all; clc;
 
 s = tf("s");
+
+K_p = 328.4945;
+K_i =275.9807;
+K_d = 184.9145;
+
+C_s = (K_d * s^2 + K_p * s + K_i)/(s);
+
 G_s = (0.0526)/(s^2 + 0.8842*s);
 
-rlocus(G_s);
+rlocus(C_s * G_s);
 
 % Adiciona o círculo unitário como referência de estabilidade
 hold on;

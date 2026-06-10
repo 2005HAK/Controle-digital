@@ -3,7 +3,7 @@ clear; close all; clc;
 % --- 1. Definição do Sistema ---
 s = tf("s");
 % Parâmetros (usando os valores arredondados do seu trabalho)
-G_s = (0.0526)/(s^2 + 2.2105*s);
+G_s = (0.0526)/(s^2 + 0.8842*s);
 
 % --- 2. Definição do Limite ---
 % Ts <= 10s  -->  4/sigma <= 10  --> sigma >= 0.4

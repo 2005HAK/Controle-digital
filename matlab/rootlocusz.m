@@ -9,7 +9,7 @@ z = tf('z', Ts);
 
 % Montagem da Funcao de Transferencia Discreta G(z)
 % Utilizando as equacoes literais para manter a precisao das casas decimais
-numerador = 0.0526 * (-0.0983*z + 0.1182);
+numerador = 0.0526 * (0.02273*z + 0.02111);
 denominador = (2.2105^2) * (z - 1) * (z - exp(-0.22105));
 
 % Planta Discreta final
