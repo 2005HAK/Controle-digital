@@ -531,57 +531,59 @@
 
 		\subsection{Controlador PID}
 
-			Apesar de ter sido constatado que um controlador Proporcional é suficiente para estabilizar o sistema e atender aos requisitos de desempenho, a utilização de um PID será necessária para a implementação prática, visto que o AUV possui flutuabilidade positiva, o que implica que a força de empuxo força o AUV a subir. Assim, um controlador proporcional puro, na prática, não seria capaz de manter o veículo na profundidade desejada, ele sepre estaria com um erro em relação a referência para que ele se mantenha em equilibrio. 
+			Apesar da análise teórica em malha fechada demonstrar que um controlador puramente Proporcional (P) é capaz de estabilizar o sistema linearizado, a implementação prática no veículo exige uma arquitetura de controle mais robusta para lidar com perturbações físicas não modeladas. 
 
-			Na realidade o que seria necessário é somente um integrador no controlador para que o erro seja acumulado e o AUV estabilize na referência desejada, mas a insersão do integrador toranara o sistema mais oscilatório, por isso optou-se por um controlador PID.
+			Por questões de segurança operacional, o AUV Yvy foi projetado com flutuabilidade levemente positiva, garantindo que o veículo retorne naturalmente à superfície em caso de falha de energia. Esta flutuabilidade atua como uma perturbação constante que empurra o veículo para cima. Sob a ação de um controlador Proporcional, os propulsores verticais apenas geram força se houver um erro de profundidade ativo. Consequentemente, o veículo nunca atingiria a referência exata, sendo forçado a estabilizar alguns centímetros acima do alvo (erro em regime permanente) para que o sistema gere o empuxo necessário para contrabalançar a flutuabilidade.
 
-			O controlador PID é definido pela seguinte função de transferência:
+			Para anular este erro estacionário, torna-se indispensável a introdução de uma ação Integral (I), que acumula o erro ao longo do tempo e gera o esforço de controle constante exigido para manter o equilíbrio hidrostático na cota desejada. No entanto, a adição de um integrador aumenta o tipo do sistema e insere um atraso de fase na malha, tornando a resposta transitória significativamente mais oscilatória. Para compensar essa degradação de estabilidade e atuar como um amortecimento ativo, introduziu-se também a ação Derivativa (D), consolidando a estrutura de um controlador PID.
 
-			% ------------------ Continuar daqui ------------------ %
+			A função de transferência clássica do controlador PID é definida por:
 
 			\begin{equation}
 				C(s) = K_p + \frac{K_i}{s} + K_d s
 			\end{equation}
 
-			Aplicando o controlador na planta tem-se:
+			Para fins de projeto pelo Lugar das Raízes, a função de transferência é manipulada algebricamente para evidenciar a presença de um polo na origem e dois zeros ajustáveis:
 
 			\begin{equation}
-				
-			\end{equation}
-
-			A função de transferência tambem pode ser reescrita para evidenciar os zeros do controlador:
-
-			\begin{equation}
-				C(s) = \frac{K_d s^2 + K_p s + K_i}{s} = \frac{K\left(s + a + jb\right)\left(s + a - jb\right)}{s}
+				C(s) = \frac{K_d s^2 + K_p s + K_i}{s} = \frac{K(s + a)(s + b)}{s}
 				\label{eq:pidzeros}
 			\end{equation}
 
-			Com isso pode-se inserir os dois zeros do controlador logo acima do polo de malha aberta, em $s=-0,8842$, e abaixo da região de sobressinal, ou seja, a parte imaginaria deve ser menor que $2,318$ (valor retirado do Lugar das Raízes). Com o intuito de manter os polos de malha fechada dentro da região definida pelos requisitos de desempenho, optou-se por posicionar os zeros em $s = -0,8842 \pm 0,1$, logo, pela equação \ref{eq:pidzeros} tem-se $a=-0,8842$ e $b=0,1$. Com isso, pode-se calcular os ganhos $K_p$, $K_i$ e $K_d$ a partir da relação entre os coeficientes do numerador do controlador e os zeros escolhidos:
-
-			\begin{equation}
-				K_p = K \cdot 2a = 4,210K
-			\end{equation}
-
-			\begin{equation}
-				K_i = K \cdot (a^2 + b^2) = 4,4410K
-			\end{equation}
+			A partir da expansão polinomial do numerador da Equação \ref{eq:pidzeros}, as constantes de ganho do controlador podem ser mapeadas diretamente pelas seguintes relações algébricas equivalentes:
 
 			\begin{equation}
 				K_d = K
 			\end{equation}
-
 			\begin{equation}
-				K_d = K
+				K_p = K(a + b)
+			\end{equation}
+			\begin{equation}
+				K_i = K(ab)
 			\end{equation}
 
-			Determiniando, arbitrariamente, $K_d = 1$, tem-se $K_p = -4,210$ e $K_i = 4,4410$. A simulação da resposta ao degrau para este controlador PID é apresentada na Figura \ref{fig:Resposta_controlador_PID}.
+			Os parâmetros da malha foram determinados mediante a alocação criteriosa dos zeros do controlador, visando forçar os polos dominantes de malha fechada a convergirem para uma região específica do plano complexo $S$ que satisfaça os requisitos de sobressinal ($PSS$) e tempo de acomodação ($T_s$). 
+
+			A estratégia de projeto adotada baseou-se no método de cancelamento de polos. O primeiro zero do controlador foi posicionado em $s = a$, com $a = -0,8842$, de forma a anular o polo não-integrador da dinâmica da planta. Com este cancelamento, o sistema em malha aberta passa a possuir um polo duplo na origem (um proveniente da planta e outro do controlador), restando apenas o grau de liberdade para posicionar o segundo zero ($s = b$, ou $z_2$).
+
+			A posição deste segundo zero foi definida analiticamente utilizando o Critério de Ângulo do Lugar das Raízes. Para que os polos de malha fechada transitem pelo ponto de projeto desejado ($s_d = \sigma + j\omega$), a soma vetorial dos ângulos deve resultar em um múltiplo ímpar de $180^\circ$. Considerando a contribuição angular dupla dos polos na origem ($\phi_p$), o ângulo necessário para o zero ($\phi_{z2}$) é calculado por:
+
+			\begin{equation}
+				\phi_{z2} = 180^\circ + 2\text{atan2}(\omega, \sigma)
+			\end{equation}
+
+			Com a definição do ângulo, a localização exata do zero $z_2$ no eixo real é extraída por trigonometria simples, relacionando os catetos do triângulo formado no plano complexo:
+
+			\begin{equation}
+				z_2 = \sigma - \frac{\omega}{\tan(\phi_{z2})}
+			\end{equation}
+
+			Aplicando as restrições de desempenho do projeto, o zero resultante foi posicionado em $z_2 = -0,42$. O ganho de malha ($K$) associado a este ponto de operação foi calculado como $K \ge 15,2091$. Utilizando este limite de ganho e substituindo os zeros encontrados nas equações algébricas derivadas anteriormente, obtêm-se as constantes definitivas $K_p$, $K_i$ e $K_d$ para a implementação do controle de profundidade.
 
 			\begin{figure}[H]
 				\centering
 				\caption{Resposta ao degrau com controlador PID.}
-
 				%\includegraphics[width=0.8\textwidth]{img/respostaPID.jpg}
-
 				\vspace{.5em}
 				\textit{\footnotesize Fonte: Do autor}
 				\label{fig:Resposta_controlador_PID}

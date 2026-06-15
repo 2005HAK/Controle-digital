@@ -3,7 +3,7 @@ clear; close all; clc;
 % --- 1. Definição da Planta ---
 s = tf("s");
 % Seus parâmetros (arredondados)
-G_s = (0.0526)/(s^2 + 2.2105*s);
+G_s = (0.0526)/(s^2 + 0.8842*s);
 
 % --- 2. Definição dos Ganhos para Teste ---
 % Vamos testar 3 cenários para ver o comportamento

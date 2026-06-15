@@ -2,11 +2,11 @@ clear; close all; clc;
 
 % --- 1. Definição do Sistema ---
 s = tf("s");
-%K_p = 2.0421;
-%K_i = 0.8989;
-%K_d = 1;
+K_p = 1.3042;
+K_i = 0.371364;
+K_d = 1;
 
-%C_s = (K_d * s^2 + K_p * s + K_i)/(s);
+C_s = (K_d * s^2 + K_p * s + K_i)/(s);
 
 % Parâmetros da planta do AUV
 G_s = (0.0526)/(s^2 + 0.8842*s);
@@ -21,7 +21,7 @@ angulo_rad = acos(zeta_min); % Ângulo em radianos a partir do eixo real negativ
 
 % --- 3. Plotagem do Lugar das Raízes ---
 figure;
-rlocus(G_s);
+rlocus(C_s * G_s);
 hold on;
 axis equal; % CRUCIAL: Garante que os ângulos visuais sejam verdadeiros
 grid on;

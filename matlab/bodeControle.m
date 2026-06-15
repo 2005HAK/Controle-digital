@@ -3,11 +3,15 @@ clear; close all; clc;
 % --- 1. Definição do Sistema ---
 s = tf("s");
 G_s = (0.0526)/(s^2 + 0.8842*s);
-Kp = 3.72;
+K_p = 20.41878;
+K_i = 5.623512;
+K_d = 15.9;
+
+C_s = (K_d * s^2 + K_p * s + K_i)/(s);
 
 % --- 2. Malha Aberta (L) ---
 % A análise de estabilidade (Margens) é feita na MALHA ABERTA!
-L = Kp * G_s;
+L = C_s * G_s;
 
 % --- 3. Malha Fechada (H) ---
 % A análise de velocidade (Largura de Banda) é feita na MALHA FECHADA!
@@ -19,7 +23,7 @@ figure;
 % A função margin plota o Bode e já marca as margens visualmente
 margin(L); 
 grid on;
-title(['Diagrama de Bode de Malha Aberta (Kp = ' num2str(Kp) ')']);
+title(['Diagrama de Bode de Malha Aberta (Cs)']);
 
 % Extraindo os valores numéricos
 [Gm, Pm, Wcg, Wcp] = margin(L);

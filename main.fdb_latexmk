@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex main"] 1781089237.45769 "main.aux" "main.bbl" "main" 1781089245.03302 0
-  "./referencias.bib" 1780481478 672 ff8749ddf0a54e715e45c2a68f41e293 ""
+["bibtex main"] 1781549697.84425 "main.aux" "main.bbl" "main" 1781549856.44777 0
+  "./referencias.bib" 1781534959 908 b7fd668d368b30361225e46cc2524b0c ""
   "C:/Users/heber/AppData/Local/Programs/MiKTeX/bibtex/bst/bibtex/plain.bst" 1291864736 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "main.aux" 1781089244 10009 b1cec42ff4ca96d8f170d5ca93ade977 "pdflatex"
+  "main.aux" 1781549855 10009 fe5c79452d1e2698b2fa8c4be8c36646 "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1781089242.50139 "c:/Users/heber/OneDrive/Documentos/Codigos/UFSC/Controle-digital/main.tex" "main.pdf" "main" 1781089245.03392 2
+["pdflatex"] 1781549854.03356 "c:/Users/heber/OneDrive/Documentos/Codigos/UFSC/Controle-digital/main.tex" "main.pdf" "main" 1781549856.44845 0
   "C:/Users/heber/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1762254091 80909 eab91d9745dd2edfd62a31d53cd5fe15 ""
   "C:/Users/heber/AppData/Local/MiKTeX/fonts/pk/ljfour/jknappen/ec/dpi600/ecbx1095.pk" 1762254098 28976 734d6f1e99821027b253304d691494e3 ""
   "C:/Users/heber/AppData/Local/MiKTeX/fonts/pk/ljfour/jknappen/ec/dpi600/ecbx1200.pk" 1762254101 31952 7da9db42b287ab07b4365ed8d7437778 ""
@@ -118,7 +118,7 @@
   "C:/Users/heber/AppData/Local/Programs/MiKTeX/tex/latex/tools/indentfirst.sty" 1749468414 1618 30b01152766afcef2ed8f904cfdd3cc6 ""
   "C:/Users/heber/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "C:/Users/heber/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1729265222 55384 b454dec21c2d9f45ec0b793f0995b992 ""
-  "c:/Users/heber/OneDrive/Documentos/Codigos/UFSC/Controle-digital/main.tex" 1781089235 52206 1f8840f77bfcae8cbb09028d2c8a9b1c ""
+  "c:/Users/heber/OneDrive/Documentos/Codigos/UFSC/Controle-digital/main.tex" 1781549853 54154 6c991d6041daca4a4d1c12ea000a5c97 ""
   "img/BodeMF.jpg" 1780481478 60049 ca9ec551ed667f7d89db371d201ad938 ""
   "img/LugarDasRaizesGz10hz.jpeg" 1781024004 92710 b4c979a83eaf4b88481cb3f9ffff01b1 ""
   "img/LugarDasRaizesGz66hz.jpeg" 1781024004 92811 860a8f6278ea9c3072d052e357c25e99 ""
@@ -131,11 +131,11 @@
   "img/root_locus_Gs.jpg" 1781037870 44829 ab927a1129274877e149e92904eb395d ""
   "img/testePD.jpg" 1780481478 55398 0afb12651116afb1ee21b7772d0717de ""
   "img/testesKps.jpg" 1780481478 68099 622b2d6bad879a8659f0ac9bab22a160 ""
-  "main.aux" 1781089244 10009 b1cec42ff4ca96d8f170d5ca93ade977 "pdflatex"
-  "main.bbl" 1781089237 349 635d1a14fbe024ca33e1052aa21a205d "bibtex main"
-  "main.out" 1781089244 7179 d37da56136e008b6ff131f1f93a49e39 "pdflatex"
-  "main.tex" 1781089235 52206 1f8840f77bfcae8cbb09028d2c8a9b1c ""
-  "main.toc" 1781089244 3324 9973a899429d970b2a8fdfb421d474c4 "pdflatex"
+  "main.aux" 1781549855 10009 fe5c79452d1e2698b2fa8c4be8c36646 "pdflatex"
+  "main.bbl" 1781549698 349 635d1a14fbe024ca33e1052aa21a205d "bibtex main"
+  "main.out" 1781549855 7179 d37da56136e008b6ff131f1f93a49e39 "pdflatex"
+  "main.tex" 1781549853 54154 6c991d6041daca4a4d1c12ea000a5c97 ""
+  "main.toc" 1781549855 3324 ffd951ffc8e63f532730629b94b8381b "pdflatex"
   (generated)
   "main.aux"
   "main.log"
