@@ -37,6 +37,7 @@ L_s = (polyval(num_zeros, s_star) / s_star) * ...
 K = 1 / abs(L_s);
 fprintf('K mínimo = %.4f\n', K);
 
+K = 130;
 % Extrai Kd, Kp, Ki
 Kd = K;
 Kp = K * (-(z1 + z2));        % coef de s no numerador expandido * K

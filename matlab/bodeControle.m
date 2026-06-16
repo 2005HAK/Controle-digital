@@ -3,9 +3,9 @@ clear; close all; clc;
 % --- 1. Definição do Sistema ---
 s = tf("s");
 G_s = (0.0526)/(s^2 + 0.8842*s);
-K_p = 20.41878;
-K_i = 5.623512;
-K_d = 15.9;
+K_d=130.0000;
+K_p=169.5406;
+K_i=48.2725;
 
 C_s = (K_d * s^2 + K_p * s + K_i)/(s);
 
