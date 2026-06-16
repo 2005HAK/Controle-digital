@@ -489,8 +489,6 @@
 				\label{fig:PSSTSRegion}
 			\end{figure}
 
-			% ------------- Acho que essa parte vai sair ------------------- %
-
 			\subsubsection{Seleção do Ganho}
 
 			Com base na região válida identificada, determinou-se a faixa de ganhos que mantém os polos dentro do cone de amortecimento. A análise gráfica indica que o sistema atende aos requisitos para:
@@ -522,12 +520,7 @@
 				compromisso entre velocidade (acomodação em $< 4s$) e amortecimento (sem sobressinal significativo).
 			\end{itemize}
 
-			Optou-se, portanto, pelo ganho $K_p = 30,35$. Esta escolha confere {\bfseries robustez} ao sistema de 
-			controle, garantindo uma margem de segurança contra incertezas paramétricas (como variações no arrasto 
-			hidrodinâmico) e evitando a saturação excessiva dos propulsores, mantendo o desempenho bem dentro das 
-			especificações de projeto.
-		
-		% ------------- ^ Acho que essa parte vai sair ^ ------------------- %
+			Optou-se, portanto, pelo ganho $K_p = 30,35$. Esta escolha confere {\bfseries robustez} ao sistema de controle, garantindo uma margem de segurança contra incertezas paramétricas (como variações no arrasto hidrodinâmico) e evitando a saturação excessiva dos propulsores, mantendo o desempenho bem dentro das especificações de projeto.
 
 		\subsection{Controlador PID}
 
@@ -598,99 +591,17 @@
 				K_i = K(0,8842 \cdot 0,42) = 0,371364K
 			\end{equation}
 
-			Com isto, se fizer K igual ao limite inferior os requisitos não vao ser atendidos, visto que a região delimitada no rootlocus é valida para sistemas de segunda ordem, e este não é mais um sistema desse tipo por conta do PIPD. Deste modo o valor de K deve ser ajustado manualmente até que na resposta ao degrau unitário o sobressinal fique abaixo de 5\%. Ao fazer isso, o K encontrado é de 130 para que o sobressinal fique abaixo de 5\%, resultando em $K_p = 169,5406$, $K_i = 48,2725$ e $K_d = 130$, mas como consequencia o tempo de acomodação foi reduzido para $2,59 \text{ s}$.
+			Com isto, se fizer K igual ao limite inferior os requisitos não vao ser atendidos, visto que a região delimitada no rootlocus é valida para sistemas de segunda ordem, e este não é mais um sistema desse tipo por conta do PIPD. Deste modo o valor de K deve ser ajustado manualmente até que na resposta ao degrau unitário o sobressinal fique abaixo de 5\%. Ao fazer isso, o K encontrado é de 130 para que o sobressinal fique abaixo de 5\%, resultando em $K_p = 169,5406$, $K_i = 48,2725$ e $K_d = 130$, mas como consequencia o tempo de acomodação foi reduzido para $2,59 \text{ s}$ como pode ser visto na figura \ref{fig:Resposta_controlador_PID}.
 
 			\begin{figure}[H]
 				\centering
 				\caption{Resposta ao degrau com controlador PID.}
+
 				\includegraphics[width=0.8\textwidth]{img/respostaPID.jpg}
-				\vspace{.5em}
+
 				\textit{\footnotesize Fonte: Do autor}
 				\label{fig:Resposta_controlador_PID}
 			\end{figure}
-
-		\subsection{Análise Comparativa com Controlador PD}
-
-			A análise realizada na seção anterior demonstrou que um controlador puramente Proporcional ($P$) com 
-			ganho $K_p = 30,35$ é suficiente para garantir a estabilidade e atender aos requisitos de desempenho 
-			($T_s \le 10s$ e $PSS \le 5\%$). No entanto, visando explorar o potencial máximo de desempenho da 
-			planta e atender ao requisito acadêmico de avaliação de controladores da família PID, investiga-se 
-			nesta seção o impacto da adição de um termo derivativo (controlador $PD$).
-
-			Ressalta-se que a ação Integral ($I$) não será considerada, pois a planta do tipo 1 já garante erro 
-			nulo em regime permanente para entradas em degrau. A adição de um integrador neste caso reduziria a 
-			margem de fase e introduziria oscilações desnecessárias.
-
-			A função de transferência do controlador PD é dada por:
-
-			\begin{equation}
-				C(s) = K_p + K_d s = K_d \left(s + \frac{K_p}{K_d} \right)
-			\end{equation}
-
-			A função de transferência de malha fechada resultante, com o zero do controlador em evidência, é:
-
-			\begin{equation}
-				\frac{Z(s)}{Z_{ref}(s)} = \frac{0.0526 K_d(s + z_c)}{s^2 + (2.2105 + 0.0526 K_d) s + 0.0526 K_p}
-			\end{equation}
-			
-			onde $z_c = K_p/K_d$ é a posição do zero introduzido pelo controlador.
-
-			A principal limitação do controlador Proporcional, identificada no Lugar das Raízes original, é que a 
-			parte real dos polos complexos é fixa em $\sigma = -1.11$. Isso impõe um limite físico à velocidade de 
-			acomodação do sistema, tal que:
-			
-			\begin{equation}
-				T_{s_{min}} \approx \frac{4}{|\sigma|} = \frac{4}{1.11} \approx 3.6 s
-			\end{equation}
-
-			A introdução do zero pelo controlador PD altera a assíntota do Lugar das Raízes, atraindo os polos de 
-			malha fechada para a esquerda no plano complexo. Ajustando-se a razão $K_p/K_d = 3$ (zero em $s=-3$), 
-			obtém-se o comportamento ilustrado na Figura \ref{fig:Lugar_das_raizes_PD}.
-
-			\begin{figure}[H]
-				\centering
-				\caption{Lugar das Raízes com a introdução de um zero em $s=-3$ (Ação PD).}
-
-				\includegraphics[width=1\textwidth]{img/testePD.jpg}
-
-				\vspace{.5em}
-				\textit{\footnotesize Fonte: Do autor}
-				\label{fig:Lugar_das_raizes_PD}
-			\end{figure}
-
-			Com a ação derivativa, torna-se possível alocar os polos em regiões com parte real muito mais negativa 
-			(por exemplo, $\sigma \approx -4.54$), resultando em um tempo de acomodação drasticamente reduzido:
-
-			\begin{equation}
-				T_s \approx \frac{4}{4.54} = 0.88 s
-			\end{equation}
-
-			A Figura \ref{fig:Resposta_controlador_PD} apresenta a simulação da resposta temporal para este cenário agressivo ($K_d = 133$, $K_p = 399$).
-
-			\begin{figure}[H]
-				\centering
-				\caption{Resposta ao degrau com controlador PD ($T_s < 1s$).}
-
-				\includegraphics[width=0.8\textwidth]{img/respostaPD.jpg}
-
-				\vspace{.5em}
-				\textit{\footnotesize Fonte: Do autor}
-				\label{fig:Resposta_controlador_PD}
-			\end{figure}
-
-			\subsubsection{Seleção Final da Estrutura de Controle}
-			
-			Embora o controlador PD permita tempos de acomodação inferiores a 1 segundo, {\bfseries optou-se pela utilização do controlador Proporcional (P)} definido na seção anterior ($K_p = 30,35$). Esta decisão de projeto baseia-se nos seguintes critérios de engenharia:
-
-			\begin{enumerate}
-				\item \textbf{Suficiência:} O tempo de acomodação obtido com o controlador P ($\approx 3.5 s$) já atende com folga ao requisito de $10 s$.
-
-				\item \textbf{Esforço de Controle:} A resposta extremamente rápida do PD ($0.88 s$) exigiria picos de corrente elevados nos motores, levando à saturação dos atuadores e invalidando o modelo linear.
-
-				\item \textbf{Imunidade a Ruídos:} A ação derivativa amplifica ruídos de alta frequência provenientes dos sensores. Em um ambiente subaquático real, isso causaria vibração excessiva nos propulsores sem benefício prático na dinâmica lenta de profundidade.
-			\end{enumerate}
-
-			Dessa forma, o controlador proporcional apresenta a melhor relação custo-benefício (complexidade vs. desempenho) para esta aplicação.
 
 		\subsection{Análise de Resposta em Frequência}
 
