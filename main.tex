@@ -564,12 +564,12 @@
 
 			Os parâmetros da malha foram determinados mediante a alocação criteriosa dos zeros do controlador, visando forçar os polos dominantes de malha fechada a convergirem para uma região específica do plano complexo $S$ que satisfaça os requisitos de sobressinal ($PSS$) e tempo de acomodação ($T_s$). 
 
-			A estratégia de projeto adotada baseou-se no método de cancelamento de polos. O primeiro zero do controlador foi posicionado em $s = a$, com $a = -0,8842$, de forma a anular o polo não-integrador da dinâmica da planta. Com este cancelamento, o sistema em malha aberta passa a possuir um polo duplo na origem (um proveniente da planta e outro do controlador), restando apenas o grau de liberdade para posicionar o segundo zero ($s = b$, ou $z_2$).
+			A estratégia de projeto adotada baseou-se no método de cancelamento de polos. O primeiro zero do controlador foi posicionado em $s = -a$, com $a = 0,8842$, de forma a anular o polo não-integrador da dinâmica da planta. Com este cancelamento, o sistema em malha aberta passa a possuir um polo duplo na origem (um proveniente da planta e outro do controlador), restando apenas o grau de liberdade para posicionar o segundo zero ($s = -b$, ou $z_2$).
 
-			A posição deste segundo zero foi definida analiticamente utilizando o Critério de Ângulo do Lugar das Raízes. Para que os polos de malha fechada transitem pelo ponto de projeto desejado ($s_d = \sigma + j\omega$), a soma vetorial dos ângulos deve resultar em um múltiplo ímpar de $180^\circ$. Considerando a contribuição angular dupla dos polos na origem ($\phi_p$), o ângulo necessário para o zero ($\phi_{z2}$) é calculado por:
+			A posição deste segundo zero foi definida analiticamente utilizando o Critério de Ângulo do Lugar das Raízes. Primeiramente, definiu-se o ponto de operação desejado no plano complexo $s_d = \sigma + j\omega$ para atender aos requisitos de projeto. Para que os polos de malha fechada transitem por este ponto $s_d$, a soma vetorial dos ângulos deve resultar em um múltiplo ímpar de $180^\circ$. Considerando a contribuição angular dupla dos polos na origem ($\phi_p$), o ângulo necessário para o zero ($\phi_{z2}$) é calculado por:
 
 			\begin{equation}
-				\phi_{z2} = 180^\circ + 2\text{atan2}(\omega, \sigma)
+				\phi_{z2} = 180^\circ + 2\phi_p = 180^\circ + 2\text{atan2}(\omega, \sigma)
 			\end{equation}
 
 			Com a definição do ângulo, a localização exata do zero $z_2$ no eixo real é extraída por trigonometria simples, relacionando os catetos do triângulo formado no plano complexo:
@@ -578,7 +578,27 @@
 				z_2 = \sigma - \frac{\omega}{\tan(\phi_{z2})}
 			\end{equation}
 
-			Aplicando as restrições de desempenho do projeto, o zero resultante foi posicionado em $z_2 = -0,42$. O ganho de malha ($K$) associado a este ponto de operação foi calculado como $K \ge 15,2091$. Utilizando este limite de ganho e substituindo os zeros encontrados nas equações algébricas derivadas anteriormente, obtêm-se as constantes definitivas $K_p$, $K_i$ e $K_d$ para a implementação do controle de profundidade.
+			Substituindo os valores do ponto de projeto escolhido ($\sigma = -0,4$ e $\omega = 0,4195$):
+
+			\begin{equation}
+				z_2 = -0,4 - \frac{0,4195}{\tan(\phi_{z2})} = -0,42
+			\end{equation}
+
+			Aplicando as restrições de desempenho do projeto, o zero resultante foi posicionado em $z_2 = -0,42$. O ganho de malha ($K$) associado a este ponto de operação foi calculado como $K \ge 15,2091$. Utilizando este limite de ganho e substituindo os zeros encontrados ($a = 0,8842$ e $b = 0,42$) nas equações algébricas derivadas anteriormente, obtêm-se as constantes definitivas $K_p$, $K_i$ e $K_d$ para a implementação do controle de profundidade:
+
+			\begin{equation}
+				K_d = K
+			\end{equation}
+
+			\begin{equation}
+				K_p = K(0,8842 + 0,42) = 1,3042K
+			\end{equation}
+
+			\begin{equation}
+				K_i = K(0,8842 \cdot 0,42) = 0,371364K
+			\end{equation}
+
+			Com isto, se fizer K igual ao limite inferior os requisitos não vao ser atendidos, visto que a região delimitada no rootlocus é valida para sistemas de segunda ordem, e este não é mais um sistema desse tipo por conta do PIPD. Deste modo o valor de K deve ser ajustado manualmente até que na resposta ao degrau unitário o sobressinal fique abaixo de 5\%. Ao fazer isso, o K encontrado é de 130 para que o sobressinal fique abaixo de 5\%, resultando em $K_p = 169,5406$, $K_i = 48,2725$ e $K_d = 130$, mas como consequencia o tempo de acomodação foi reduzido para $2,59 \text{ s}$.
 
 			\begin{figure}[H]
 				\centering
@@ -588,7 +608,6 @@
 				\textit{\footnotesize Fonte: Do autor}
 				\label{fig:Resposta_controlador_PID}
 			\end{figure}
-
 
 		\subsection{Análise Comparativa com Controlador PD}
 
