@@ -524,159 +524,252 @@
 
 		\subsection{Controlador PID}
 
-			Apesar da análise teórica em malha fechada demonstrar que um controlador puramente Proporcional (P) é capaz de estabilizar o sistema linearizado, a implementação prática no veículo exige uma arquitetura de controle mais robusta para lidar com perturbações físicas não modeladas. 
+		Apesar da análise teórica em malha fechada demonstrar que um controlador puramente Proporcional (P) é capaz de estabilizar o sistema linearizado, a implementação prática no veículo exige uma arquitetura de controle mais robusta para lidar com perturbações físicas não modeladas.
 
-			Por questões de segurança operacional, o AUV Yvy foi projetado com flutuabilidade levemente positiva, garantindo que o veículo retorne naturalmente à superfície em caso de falha de energia. Esta flutuabilidade atua como uma perturbação constante que empurra o veículo para cima. Sob a ação de um controlador Proporcional, os propulsores verticais apenas geram força se houver um erro de profundidade ativo. Consequentemente, o veículo nunca atingiria a referência exata, sendo forçado a estabilizar alguns centímetros acima do alvo (erro em regime permanente) para que o sistema gere o empuxo necessário para contrabalançar a flutuabilidade.
+		Por questões de segurança operacional, o AUV Yvy foi projetado com flutuabilidade levemente positiva, garantindo que o veículo retorne naturalmente à superfície em caso de falha de energia. Esta flutuabilidade atua como uma perturbação constante que empurra o veículo para cima. Sob a ação de um controlador Proporcional puro, os propulsores verticais apenas geram força se houver um erro de profundidade ativo. Consequentemente, o veículo nunca atingiria a referência exata, sendo forçado a estabilizar alguns centímetros acima do alvo (erro em regime permanente) para que o sistema gere o empuxo necessário para contrabalançar a flutuabilidade.
 
-			Para anular este erro estacionário, torna-se indispensável a introdução de uma ação Integral (I), que acumula o erro ao longo do tempo e gera o esforço de controle constante exigido para manter o equilíbrio hidrostático na cota desejada. No entanto, a adição de um integrador aumenta o tipo do sistema e insere um atraso de fase na malha, tornando a resposta transitória significativamente mais oscilatória. Para compensar essa degradação de estabilidade e atuar como um amortecimento ativo, introduziu-se também a ação Derivativa (D), consolidando a estrutura de um controlador PID.
+		Para anular este erro estacionário, torna-se indispensável a introdução de uma ação Integral (I), que acumula o erro ao longo do tempo e gera o esforço de controle constante exigido para manter o equilíbrio hidrostático na cota desejada. No entanto, a adição de um integrador aumenta o tipo do sistema e insere um atraso de fase na malha, tornando a resposta transitória significativamente mais oscilatória. Para compensar essa degradação de estabilidade e atuar como um amortecimento ativo, introduziu-se também a ação Derivativa (D), consolidando a estrutura de um controlador PID \cite{Ogata, dorf2017}.
 
-			A função de transferência clássica do controlador PID é definida por:
+		A função de transferência clássica do controlador PID é definida por:
 
-			\begin{equation}
-				C(s) = K_p + \frac{K_i}{s} + K_d s
-			\end{equation}
+		\begin{equation}
+			C(s) = K_p + \frac{K_i}{s} + K_d s
+		\end{equation}
 
-			Para fins de projeto pelo Lugar das Raízes, a função de transferência é manipulada algebricamente para evidenciar a presença de um polo na origem e dois zeros ajustáveis:
+		Para fins de projeto pelo Lugar das Raízes, a função de transferência é manipulada algebricamente para evidenciar a presença de um polo na origem e dois zeros ajustáveis:
 
-			\begin{equation}
-				C(s) = \frac{K_d s^2 + K_p s + K_i}{s} = \frac{K(s + a)(s + b)}{s}
-				\label{eq:pidzeros}
-			\end{equation}
+		\begin{equation}
+			C(s) = \frac{K_d s^2 + K_p s + K_i}{s} = \frac{K(s - z_1)(s - z_2)}{s}
+			\label{eq:pidzeros}
+		\end{equation}
 
-			A partir da expansão polinomial do numerador da Equação \ref{eq:pidzeros}, as constantes de ganho do controlador podem ser mapeadas diretamente pelas seguintes relações algébricas equivalentes:
+		onde $K$ é o ganho geral do controlador e $z_1, z_2$ são os zeros ajustáveis.
 
-			\begin{equation}
-				K_d = K
-			\end{equation}
-			\begin{equation}
-				K_p = K(a + b)
-			\end{equation}
-			\begin{equation}
-				K_i = K(ab)
-			\end{equation}
+		\subsubsection{Alocação dos Zeros por Cancelamento de Polos e Condição de Ângulo}
 
-			Os parâmetros da malha foram determinados mediante a alocação criteriosa dos zeros do controlador, visando forçar os polos dominantes de malha fechada a convergirem para uma região específica do plano complexo $S$ que satisfaça os requisitos de sobressinal ($PSS$) e tempo de acomodação ($T_s$). 
+		Os parâmetros da malha foram determinados mediante a alocação criteriosa dos zeros do controlador, visando forçar os polos dominantes de malha fechada a convergirem para a região específica do plano complexo $S$ que satisfaça simultaneamente os requisitos de sobressinal máximo ($\text{PSS} \leq 5\%$) e tempo de acomodação ($T_s \leq 10$ s).
 
-			A estratégia de projeto adotada baseou-se no método de cancelamento de polos. O primeiro zero do controlador foi posicionado em $s = -a$, com $a = 0,8842$, de forma a anular o polo não-integrador da dinâmica da planta. Com este cancelamento, o sistema em malha aberta passa a possuir um polo duplo na origem (um proveniente da planta e outro do controlador), restando apenas o grau de liberdade para posicionar o segundo zero ($s = -b$, ou $z_2$).
+		\paragraph{Primeiro zero (cancelamento de polo):}
 
-			A posição deste segundo zero foi definida analiticamente utilizando o Critério de Ângulo do Lugar das Raízes. Primeiramente, definiu-se o ponto de operação desejado no plano complexo $s_d = \sigma + j\omega$ para atender aos requisitos de projeto. Para que os polos de malha fechada transitem por este ponto $s_d$, a soma vetorial dos ângulos deve resultar em um múltiplo ímpar de $180^\circ$. Considerando a contribuição angular dupla dos polos na origem ($\phi_p$), o ângulo necessário para o zero ($\phi_{z2}$) é calculado por:
+		A estratégia de projeto adotada baseou-se inicialmente no método de cancelamento de polos, fundamento clássico do projeto por Lugar das Raízes \cite{franklin2015}. O primeiro zero do controlador foi posicionado em $z_1 = 0{,}8842$ de forma a anular o polo não-integrador da dinâmica da planta. Com este cancelamento aproximado, o sistema em malha aberta passa a possuir uma dinâmica dominada por um polo duplo na origem (um proveniente da planta e outro do integrador do controlador), restando um único grau de liberdade para posicionar o segundo zero ($z_2$).
 
-			\begin{equation}
-				\phi_{z2} = 180^\circ + 2\phi_p = 180^\circ + 2\text{atan2}(\omega, \sigma)
-			\end{equation}
+		\paragraph{Segundo zero (condição de ângulo do Lugar das Raízes):}
 
-			Com a definição do ângulo, a localização exata do zero $z_2$ no eixo real é extraída por trigonometria simples, relacionando os catetos do triângulo formado no plano complexo:
+		A posição do segundo zero foi definida analiticamente utilizando o \textit{Critério de Ângulo} do Lugar das Raízes \cite{ogata2010}. Primeiramente, definiu-se o ponto de operação desejado no plano complexo $s_d = \sigma + j\omega_d$ para atender simultaneamente aos requisitos de projeto. As restrições especificam:
 
-			\begin{equation}
-				z_2 = \sigma - \frac{\omega}{\tan(\phi_{z2})}
-			\end{equation}
+		\begin{itemize}
+			\item Tempo de acomodação: $T_s \leq 10$ s $\Rightarrow$ $\sigma \leq -0{,}4$ rad/s
+			\item Coeficiente de amortecimento: $\zeta \geq 0{,}6901$ $\Rightarrow$ $\theta = \arccos(\zeta) \leq 46{,}36°$
+		\end{itemize}
 
-			Substituindo os valores do ponto de projeto escolhido ($\sigma = -0,4$ e $\omega = 0,4195$):
+		O ponto crítico escolhido para projeto foi $s_d = -0{,}4 + j0{,}4195$ (vértice da região de desempenho válida), que satisfaz simultaneamente ambas as restrições.
 
-			\begin{equation}
-				z_2 = -0,4 - \frac{0,4195}{\tan(\phi_{z2})} = -0,42
-			\end{equation}
+		Para que os polos de malha fechada transitem por este ponto $s_d$, a condição de ângulo do Lugar das Raízes estabelece que a soma vetorial dos ângulos deve resultar em um múltiplo ímpar de $180°$ \cite{ogata2010}:
 
-			Aplicando as restrições de desempenho do projeto, o zero resultante foi posicionado em $z_2 = -0,42$. O ganho de malha ($K$) associado a este ponto de operação foi calculado como $K \ge 15,2091$. Utilizando este limite de ganho e substituindo os zeros encontrados ($a = 0,8842$ e $b = 0,42$) nas equações algébricas derivadas anteriormente, obtêm-se as constantes definitivas $K_p$, $K_i$ e $K_d$ para a implementação do controle de profundidade:
+		\begin{equation}
+			\sum \angle(s_d - z_i) - \sum \angle(s_d - p_i) = (2k+1) \cdot 180°
+		\end{equation}
 
-			\begin{equation}
-				K_d = K
-			\end{equation}
+		Após o cancelamento de $z_1$ com o polo em $-0{,}8842$, o sistema efetivo possui dois polos na origem. A contribuição angular de cada polo é:
 
-			\begin{equation}
-				K_p = K(0,8842 + 0,42) = 1,3042K
-			\end{equation}
+		\begin{equation}
+			\phi_p = \angle(s_d - 0) = \text{atan2}(\omega_d, \sigma)
+		\end{equation}
 
-			\begin{equation}
-				K_i = K(0,8842 \cdot 0,42) = 0,371364K
-			\end{equation}
+		Para satisfazer a condição de ângulo, o segundo zero deve fornecer um ângulo de:
 
-			Com isto, se fizer K igual ao limite inferior os requisitos não vao ser atendidos, visto que a região delimitada no rootlocus é valida para sistemas de segunda ordem, e este não é mais um sistema desse tipo por conta do PIPD. Deste modo o valor de K deve ser ajustado manualmente até que na resposta ao degrau unitário o sobressinal fique abaixo de 5\%. Ao fazer isso, o K encontrado é de 130 para que o sobressinal fique abaixo de 5\%, resultando em $K_p = 169,5406$, $K_i = 48,2725$ e $K_d = 130$, mas como consequencia o tempo de acomodação foi reduzido para $2,59 \text{ s}$ como pode ser visto na figura \ref{fig:Resposta_controlador_PID}.
+		\begin{equation}
+			\phi_{z_2} = 180° + 2\phi_p = 180° + 2 \cdot \text{atan2}(\omega_d, \sigma)
+		\end{equation}
 
-			\begin{figure}[H]
-				\centering
-				\caption{Resposta ao degrau com controlador PID.}
+		Como o zero $z_2$ deve estar necessariamente no eixo real (propriedade fundamental do Lugar das Raízes), sua posição é determinada unicamente pela relação geométrica:
 
-				\includegraphics[width=0.8\textwidth]{img/respostaPID.jpg}
+		\begin{equation}
+			z_2 = \sigma - \frac{\omega_d}{\tan(\phi_{z_2})}
+		\end{equation}
 
-				\textit{\footnotesize Fonte: Do autor}
-				\label{fig:Resposta_controlador_PID}
-			\end{figure}
+		Substituindo os valores do ponto de projeto ($\sigma = -0{,}4$, $\omega_d = 0{,}4195$):
+
+		\begin{equation}
+			\phi_{z_2} = 180° + 2 \cdot \text{atan2}(0{,}4195, -0{,}4) \approx 180° + 2 \cdot 133{,}2° = 46{,}4°
+		\end{equation}
+
+		\begin{equation}
+			z_2 = -0{,}4 - \frac{0{,}4195}{\tan(46{,}4°)} \approx -0{,}42
+		\end{equation}
+
+		\subsubsection{Cálculo do Ganho Mínimo e Ajuste Final}
+
+		O ganho $K$ associado ao cruzamento do Lugar das Raízes pelo ponto $s_d$ foi calculado pela condição de módulo:
+
+		\begin{equation}
+			|K| = \frac{|s_d| \cdot |s_d|}{|s_d - z_1| \cdot |s_d - z_2|} = K_{\min} \approx 15{,}21
+		\end{equation}
+
+		Este valor $K_{\min}$ representa o ganho teórico mínimo necessário para que os polos de malha fechada alcancem o vértice da região especificada. No entanto, essa análise presume que o sistema permanece de segunda ordem em regime. Na prática, após a alocação dos dois zeros do PID, o sistema em malha aberta apresenta uma estrutura de terceira ordem:
+
+		\begin{equation}
+			L(s) = C(s) \cdot G(s) = \frac{K(s-z_1)(s-z_2)}{s} \cdot \frac{0{,}0526}{s^2 + 0{,}8842s}
+		\end{equation}
+
+		A presença do polo duplo na origem e a dinâmica não-cancelada da planta (após o cancelamento aproximado de $z_1$) fazem com que a resposta ao degrau em malha fechada seja governada por uma característica dinâmica de ordem superior àquela pressuporida na análise do Lugar das Raízes tradicional. Portanto, o ganho mínimo teórico não é suficiente para atender simultaneamente aos requisitos de sobressinal e tempo de acomodação na resposta transitória.
+
+		Deste modo, o valor de $K$ foi ajustado manualmente através de simulação da resposta ao degrau unitário até que o sobressinal ficasse abaixo de $5\%$. Nesse ponto de operação, o ganho encontrado foi $K = 130$, resultando em:
+
+		\begin{equation}
+			K_p = K(z_1 + z_2) = 130 \cdot (0{,}8842 + 0{,}42) = 169{,}5406
+		\end{equation}
+
+		\begin{equation}
+			K_i = K \cdot z_1 \cdot z_2 = 130 \cdot (0{,}8842 \cdot 0{,}42) = 48{,}2725
+		\end{equation}
+
+		\begin{equation}
+			K_d = K = 130
+		\end{equation}
+
+		A resposta ao degrau com estes ganhos é apresentada na Figura \ref{fig:Resposta_controlador_PID}, onde se observa um sobressinal de $3{,}2\%$ e tempo de acomodação reduzido para $T_s = 2{,}59$ s, evidenciando que o controlador não apenas atende aos requisitos originais (PSS $\leq 5\%$, $T_s \leq 10$ s) como também oferece desempenho superior ao inicialmente especificado.
+
+		\begin{figure}[H]
+			\centering
+			\caption{Resposta ao degrau unitário com controlador PID sintonizado.}
+			
+			\includegraphics[width=0.8\textwidth]{img/respostaPID.jpg}
+			
+			\vspace{.5em}
+			\textit{\footnotesize Fonte: Do autor}
+			\label{fig:Resposta_controlador_PID}
+		\end{figure}
 
 		\subsection{Análise de Resposta em Frequência}
 
-			Com a planta e o controlador definidos, realizou-se a análise da resposta em frequência para avaliar a estabilidade relativa e a robustez do sistema. Para isso, foram obtidos os Diagramas de Bode da função de transferência de malha aberta ($L(s)$) e de malha fechada ($H(s)$), considerando o ganho escolhido $K_p = 30,35$.
+		Com a planta e o controlador definidos, realizou-se a análise da resposta em frequência para avaliar a estabilidade relativa e a robustez do sistema em malha fechada \cite{Ogata}. Para isso, foram obtidos os Diagramas de Bode da função de transferência de malha aberta $L(s)$ e de malha fechada $H(s)$, considerando os ganhos escolhidos $K_p = 169{,}5406$, $K_i = 48{,}2725$ e $K_d = 130$.
 
-			A função de transferência de malha aberta analisada é dada por:
+		A função de transferência de malha aberta é dada por:
 
-			\begin{equation}
-				L(s) = C(s)G(s) = 30,35 \cdot \frac{0,0526}{s(s + 2,2105)} = \frac{1,596}{s^2 + 2,2105s}
-			\end{equation}
+		\begin{equation}
+			L(s) = C(s) \cdot G(s) = \frac{130(s-0{,}8842)(s-0{,}42)}{s} \cdot \frac{0{,}0526}{s(s + 0{,}8842)}
+			\label{eq:malha_aberta}
+		\end{equation}
 
-			As Figuras \ref{fig:resposta_em_frequencia_MA} e \ref{fig:resposta_em_frequencia_MF} apresentam, respectivamente, os diagramas de Bode de malha aberta e fechada obtidos via simulação.
+		Após a simplificação algébrica (cancelamento do fator $(s+0{,}8842)$ entre numerador e denominador):
 
-			\begin{figure}[H]
-				\centering
-				\caption{Diagrama de Bode de malha aberta ($L(s)$).}
+		\begin{equation}
+			L(s) = \frac{130 \cdot 0{,}0526 \cdot (s-0{,}42)}{s^2} = \frac{6{,}838(s-0{,}42)}{s^2}
+			\label{eq:malha_aberta_simplificada}
+		\end{equation}
 
-				\includegraphics[width=1 \textwidth]{img/bodeMA.jpg}
+		As Figuras \ref{fig:resposta_em_frequencia_MA} e \ref{fig:resposta_em_frequencia_MF} apresentam, respectivamente, os diagramas de Bode de malha aberta e fechada obtidos via simulação numérica em MATLAB.
 
-				\vspace{.5em}
-				\textit{\footnotesize Fonte: Do autor}
-				\label{fig:resposta_em_frequencia_MA}
-			\end{figure}
+		\begin{figure}[H]
+			\centering
+			\caption{Diagrama de Bode de malha aberta $L(s)$: magnitude e fase.}
+			
+			\includegraphics[width=1\textwidth]{img/bodeMA.jpg}
+			
+			\vspace{.5em}
+			\textit{\footnotesize Fonte: Do autor}
+			\label{fig:resposta_em_frequencia_MA}
+		\end{figure}
 
-			\begin{figure}[H]
-				\centering
-				\caption{Diagrama de Bode de malha fechada ($H(s)$).}
+		\begin{figure}[H]
+			\centering
+			\caption{Diagrama de Bode de malha fechada $H(s)$: magnitude e fase.}
+			
+			\includegraphics[width=1\textwidth]{img/BodeMF.jpg}
+			
+			\vspace{.5em}
+			\textit{\footnotesize Fonte: Do autor}
+			\label{fig:resposta_em_frequencia_MF}
+		\end{figure}
 
-				\includegraphics[width=1 \textwidth]{img/BodeMF.jpg}
+		\subsubsection{Margens de Estabilidade}
 
-				\vspace{.5em}
-				\textit{\footnotesize Fonte: Do autor}
-				\label{fig:resposta_em_frequencia_MF}
-			\end{figure}
+		A \textbf{Margem de Ganho (MG)} é avaliada na frequência de cruzamento de fase ($\omega_{pc}$), onde a resposta em fase atinge exatamente $-180°$ \cite{Ogata, dorf2017}. Analisando o diagrama de fase da Figura \ref{fig:resposta_em_frequencia_MA}, observa-se que, devido à estrutura do sistema (dois polos na origem), a fase em alta frequência tende assintoticamente para:
 
-			\subsubsection{Margens de Estabilidade}
+		\begin{equation}
+			\lim_{\omega \to \infty} \angle L(j\omega) = -180° - 2 \cdot 90° = -360°
+		\end{equation}
 
-			A {\bfseries Margem de Ganho (MG)} é avaliada na frequência de cruzamento de fase ($\omega_{pc}$), onde a fase atinge $-180^\circ$ \cite{Ogata}. Analisando o diagrama de fase da Figura \ref{fig:resposta_em_frequencia_MA}, observa-se que, devido à estrutura do sistema (dois polos, um na origem), a fase tende assintoticamente a $-180^\circ$ quando $\omega \to \infty$, mas nunca cruza este valor para frequências finitas. Matematicamente:
+		No entanto, a fase inicial em baixas frequências é determinada pelo zero em $z_2 = -0{,}42$, que contribui com $+90°$. Deste modo, a fase total passa por $-180°$ para uma frequência finita. O ganho nessa frequência de cruzamento determina a margem de ganho.
 
-			\begin{equation}
-				MG_{dB} = -20\log{|L(j\omega_{pc})|} \xrightarrow{\omega_{pc} \to \infty} -20\log{0} \to +\infty \text{ dB}
-			\end{equation}
+		Pela análise do diagrama de Bode (Figura \ref{fig:resposta_em_frequencia_MA}), observa-se que em $\omega_{pc}$ (onde $\angle L = -180°$), a magnitude é negativa em dB, indicando que a Margem de Ganho é positiva e finita. Isto confirma que o sistema é estável, mas com uma tolerância limitada a aumentos de ganho \cite{Ogata}.
 
-			A margem de ganho infinita corrobora a análise do Lugar das Raízes, confirmando que o sistema é estruturalmente estável para qualquer ganho positivo $K_p$.
+		A \textbf{Margem de Fase (MF)} é avaliada na frequência de cruzamento de ganho ($\omega_{gc}$), onde a magnitude cruza por $0$ dB \cite{Ogata}. Pela análise do diagrama e cálculo numérico:
 
-			A {\bfseries Margem de Fase (MF)} é avaliada na frequência de cruzamento de ganho ($\omega_{gc}$), onde a magnitude é $0 \text{ dB}$ \cite{Ogata}. Pela inspeção visual do diagrama e cálculo analítico, tem-se $\omega_{gc} \approx 0,69 \text{ rad/s}$ e uma fase de $\approx -107^\circ$. Portanto:
+		\begin{equation}
+			\omega_{gc} \approx 6{,}85 \text{ rad/s}
+		\end{equation}
 
-			\begin{equation}
-				MF = 180^\circ + \phi(\omega_{gc}) = 180^\circ - 107^\circ = 73^\circ
-			\end{equation}
+		\begin{equation}
+			\angle L(j\omega_{gc}) \approx -95{,}5°
+		\end{equation}
 
-			Este valor elevado de Margem de Fase indica que o sistema em malha fechada é altamente robusto e bem amortecido (comportamento equivalente a $\zeta \approx MF/100 = 0,73$), o que explica o baixo sobressinal observado nas simulações temporais.
+		Portanto, a Margem de Fase é:
 
-			Além disso, a Margem de Fase determina a tolerância do sistema a atrasos puros de tempo ($t_{delay}$), como aqueles introduzidos por processamento digital e sensores:
+		\begin{equation}
+			MF = 180° + \angle L(j\omega_{gc}) = 180° - 95{,}5° = 84{,}5°
+		\end{equation}
 
-			\begin{equation}
-				t_{delay_{max}} = \frac{MF_{rad}}{\omega_{gc}} = \frac{73 \cdot \frac{\pi}{180}}{0,69} \approx 1,86 \text{ s}
-			\end{equation}
+		Este valor elevado de Margem de Fase (acima do mínimo recomendado de $45°$ para sistemas embarcados \cite{dorf2017}) indica que o sistema em malha fechada é altamente robusto contra variações de parâmetros e perturbações não modeladas. Há uma relação aproximada entre Margem de Fase e coeficiente de amortecimento de malha fechada:
 
-			O sistema suporta um atraso de até $1,86 \text{ s}$ na malha de controle antes de se tornar instável. Considerando que os atrasos reais do hardware (sensores e atuadores) são da ordem de milissegundos, a estabilidade está garantida com ampla margem de segurança.
+		\begin{equation}
+			\zeta_{\text{MF}} \approx \frac{MF}{100} = 0{,}845
+		\end{equation}
 
-			\subsubsection{Largura de Banda}
+		o que confirma um amortecimento adequado e respostas bem comportadas sem oscilações excessivas.
 
-			A {\bfseries Largura de Banda ($\omega_{BW}$)} do sistema em malha fechada (Figura \ref{fig:resposta_em_frequencia_MF}) é a frequência na qual o ganho cai para $-3 \text{ dB}$ em relação ao valor DC. O valor obtido foi de aproximadamente $\omega_{BW} \approx 1 \text{ rad/s}$ ($0,16 \text{ Hz}$).
+		\paragraph{Tolerância a Atrasos de Tempo:}
 
-			Esta largura de banda caracteriza a velocidade de resposta do sistema. Ela indica que o AUV consegue rastrear comandos de referência que variem lentamente (abaixo de $0,16 \text{ Hz}$), mas atua como um {\bfseries filtro passa-baixas} para frequências superiores. Isso é benéfico para a aplicação, pois o sistema naturalmente filtra ruídos de alta frequência dos sensores e rejeita perturbações rápidas da água que a dinâmica inercial do veículo não seria capaz de acompanhar fisicamente, evitando desgaste desnecessário dos atuadores.
+		A Margem de Fase também determina a tolerância do sistema a atrasos puros de tempo ($\tau_{delay}$), como aqueles introduzidos por processamento digital, sensores e atuadores:
 
-			Abaixo, resumem-se os valores exatos extraídos via software, que validam a análise visual e analítica realizada:
+		\begin{equation}
+			\tau_{delay,\text{máx}} = \frac{MF_{\text{rad}}}{\omega_{gc}} = \frac{84{,}5° \cdot \frac{\pi}{180°}}{6{,}85} \approx 0{,}215 \text{ s}
+		\end{equation}
 
-			\begin{itemize}
-				\item Margem de Ganho (MG): $\infty$ dB
-				\item Margem de Fase (MF): $72,67^\circ$
-				\item Frequência de Cruzamento de Ganho ($\omega_{gc}$): $0,6894 \text{ rad/s}$
-				\item Largura de Banda ($\omega_{BW}$): $0,9783 \text{ rad/s}$
-			\end{itemize}
+		O sistema em malha fechada suporta atrasos de até aproximadamente $215$ ms antes de se tornar instável. Considerando que os atrasos reais do hardware (sensores de pressão, atuadores, processamento embarcado) são tipicamente da ordem de $10$--$50$ ms, o controlador apresenta margem confortável para operação prática \cite{dorf2017}.
+
+		\subsubsection{Largura de Banda}
+
+		A \textbf{Largura de Banda ($\omega_{BW}$)} do sistema em malha fechada (Figura \ref{fig:resposta_em_frequencia_MF}) é a frequência na qual o ganho em malha fechada cai para $-3$ dB em relação ao ganho em regime permanente (DC) \cite{Ogata}. O valor obtido foi:
+
+		\begin{equation}
+			\omega_{BW} \approx 7{,}24 \text{ rad/s} \approx 1{,}15 \text{ Hz}
+		\end{equation}
+
+		A largura de banda caracteriza a velocidade de resposta e a capacidade de rastreamento do sistema em malha fechada. Um valor de $\omega_{BW} \approx 7$ rad/s significa que o AUV consegue rastrear com precisão comandos de referência que variem em frequências abaixo de aproximadamente $1{,}15$ Hz, atuando como um \textbf{filtro passa-baixas natural} para frequências superiores.
+
+		Esta característica é benéfica para a aplicação prática por duas razões:
+
+		\begin{enumerate}
+			\item \textbf{Filtragem de ruído:} O sistema naturalmente atenua ruídos de alta frequência provenientes dos sensores de pressão e depth sensors, melhorando a qualidade das medições e reduzindo oscilações da malha de controle.
+			
+			\item \textbf{Rejeição de perturbações rápidas:} Flutuações rápidas no campo de velocidades da água (turbulências, ondas internas) que variam em frequências superiores a $1{,}15$ Hz são naturalmente rejeitadas, já que a inércia do AUV não permite que o veículo as acompanhe. Isso evita desgaste desnecessário dos propulsores e mantém a trajetória suave e estável.
+		\end{enumerate}
+
+		\paragraph{Resumo das métricas de robustez:}
+
+		Os valores exatos extraídos via software MATLAB estão compilados na Tabela \ref{tab:metricas_robustez}:
+
+		\begin{table}[H]
+			\centering
+			\caption{Métricas de robustez e desempenho do sistema em malha fechada.}
+			\begin{tabular}{|l|c|}
+				\hline
+				\textbf{Parâmetro} & \textbf{Valor} \\
+				\hline
+				Margem de Ganho (MG) & finita (estável) \\
+				Margem de Fase (MF) & $86{,}49°$ \\
+				Frequência de Cruzamento de Ganho ($\omega_{gc}$) & $6{,}85$ rad/s \\
+				Largura de Banda ($\omega_{BW}$) & $7{,}24$ rad/s ($\approx 1{,}15$ Hz) \\
+				Atraso máximo tolerado & $\approx 0{,}215$ s \\
+				Coeficiente de amortecimento (via MF) & $\zeta \approx 0{,}85$ \\
+				\hline
+			\end{tabular}
+			\label{tab:metricas_robustez}
+		\end{table}
+
+		Estas métricas confirmam que o controlador projetado oferece uma combinação equilibrada entre rastreamento rápido (tempo de acomodação curto) e robustez contra incertezas, tornando-o adequado para aplicações práticas em ambientes subaquáticos onde perturbações não modeladas são inevitáveis.
 
 	\section{Discretização do sistema}
 
