@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.11.4)  15 JUN 2026 21:09
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.11.4)  15 JUN 2026 21:15
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -575,11 +575,11 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.6}) has
                                                   \__shipout_drop_firstpage_...
 l.680 
        <./img/testePD.jpg>]
-<img/bodeMA.jpg, id=340, 963.6pt x 478.78876pt>
+<img/bodeMA.jpg, id=340, 1927.2pt x 958.58125pt>
 File: img/bodeMA.jpg Graphic file (type jpg)
 <use img/bodeMA.jpg>
 Package pdftex.def Info: img/bodeMA.jpg  used on input line 711.
-(pdftex.def)             Requested size: 426.79135pt x 212.05579pt.
+(pdftex.def)             Requested size: 426.79135pt x 212.27806pt.
 
 
 [16
@@ -588,11 +588,11 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.7}) has
                                                   \__shipout_drop_firstpage_...
 l.717 
        <./img/respostaPD.jpg>]
-<img/BodeMF.jpg, id=351, 963.6pt x 478.78876pt>
+<img/BodeMF.jpg, id=351, 1927.2pt x 958.58125pt>
 File: img/BodeMF.jpg Graphic file (type jpg)
 <use img/BodeMF.jpg>
 Package pdftex.def Info: img/BodeMF.jpg  used on input line 722.
-(pdftex.def)             Requested size: 426.79135pt x 212.05579pt.
+(pdftex.def)             Requested size: 426.79135pt x 212.27806pt.
 
 
 [17
@@ -688,7 +688,7 @@ Here is how much of TeX's memory you used:
  1141 hyphenation exceptions out of 8191
  75i,11n,113p,880b,536s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\heber\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecti1000.pk> <C:\Users\heber\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1200.pk> <C:\Users\heber\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecti1200.pk> <C:\Users\heber\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1095.pk> <C:\Users\heber\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1095.pk> <C:\Users\heber\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1200.pk> <C:\Users\heber\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1200.pk><C:/Users/heber/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/heber/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/heber/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/heber/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/heber/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/heber/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/heber/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/heber/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/heber/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
-Output written on main.pdf (28 pages, 1227887 bytes).
+Output written on main.pdf (28 pages, 1324196 bytes).
 PDF statistics:
  769 PDF objects out of 1000 (max. 8388607)
  144 named destinations out of 1000 (max. 500000)
