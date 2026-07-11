@@ -2,15 +2,15 @@
 clear; close all; clc;
 
 % Tempo de amostragem definido no projeto
-Ts = 0.1; 
+Ts = 0.05; 
 
 % Declaracao da variavel complexa z no dominio discreto
 z = tf('z', Ts);
 
 % Montagem da Funcao de Transferencia Discreta G(z)
 % Utilizando as equacoes literais para manter a precisao das casas decimais
-numerador = 0.0526 * (0.02273*z + 0.02111);
-denominador = (2.2105^2) * (z - 1) * (z - exp(-0.22105));
+numerador = 0.0526 * (0.00101*z + 0.0009);
+denominador = (0.8842^2) * (z - 1) * (z - exp(-0.04421));
 
 % Planta Discreta final
 Gz = numerador / denominador;

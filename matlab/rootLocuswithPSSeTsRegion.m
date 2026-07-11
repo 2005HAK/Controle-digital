@@ -1,7 +1,10 @@
-clear; clc; close all;
+clear; close all; clc;
 
+% --- 1. Definição do Sistema ---
 s = tf("s");
-G = 0.0526 / (s^2 + 2.2105*s);
+
+% Parâmetros da planta do AUV
+G_s = (0.0526)/(s^2 + 0.8842*s);
 
 % --- 2. Definição dos Requisitos ---
 % Requisito de Tempo: Ts <= 10s -> Re(s) <= -0.4
@@ -11,26 +14,12 @@ limite_sigma = -0.4;
 zeta_min = 0.6901;
 angulo_rad = acos(zeta_min); % Ângulo em radianos a partir do eixo real negativo
 
-% --- Estratégia de Projeto PD ---
-% O PD adiciona um zero em s = -z_c
-% Quanto mais longe da origem, menos efeito ele tem.
-% Quanto mais perto, mais ele "puxa" os polos para a esquerda (mais rápido).
-
-zero_pd = 5; % Exemplo: Vamos colocar o zero em s = -1.5
-% Isso significa que a razão Kp/Kd será 1.5
-
-% A nova "planta equivalente" para o lugar das raizes é G(s) * (s + z)
-G_pd = G * (s + zero_pd);
-
+% --- 3. Plotagem do Lugar das Raízes ---
 figure;
-rlocus(G_pd);
+rlocus(G_s);
 hold on;
-sgrid(0.69, []); % Linha do seu PSS de 5% (zeta = 0.69)
-title(['Lugar das Raízes com Zero do PD em s = -', num2str(zero_pd)]);
-
-% Nota: O ganho "K" que você escolher no gráfico será o seu Kd.
-% Depois você calcula Kp = Kd * zero_pd
-
+axis equal; % CRUCIAL: Garante que os ângulos visuais sejam verdadeiros
+grid on;
 
 % Pegar os limites do gráfico para desenhar as regiões até a borda
 limites_x = xlim;
@@ -72,21 +61,3 @@ ylabel('Eixo Imaginário (j\omega)');
 legend('Lugar das Raízes', 'Região Ts (Verde)', 'Região Zeta (Azul)');
 
 hold off;
-
-% --- 8. Validação Temporal (Pós-Gráfico) ---
-% Suponha que você clicou no gráfico e achou um Ganho (Kd) = 20 (exemplo!)
-% Troque 20 pelo valor que você achou:
-Kd_escolhido = 5.83; 
-Kp_calculado = Kd_escolhido * zero_pd;
-
-% Monta o controlador
-C_final = tf([Kd_escolhido, Kp_calculado], 1); % Kd*s + Kp
-
-% Malha Fechada
-H_final = feedback(C_final * G, 1);
-
-% Simula
-figure;
-step(H_final);
-grid on;
-title(['Resposta ao Degrau com PD (Kp=', num2str(Kp_calculado), ', Kd=', num2str(Kd_escolhido), ')']);

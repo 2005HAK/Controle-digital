@@ -10,7 +10,7 @@ G_s = (0.0526)/(s^2 + 0.8842*s);
 % Kp_baixo: Resposta lenta, superamortecida
 % Kp_medio: Perto do limite do seu PSS (calculado "de olho" no LGR)
 % Kp_alto:  Resposta rápida, mas com muito sobressinal (oscilatória)
-Ganhos_Kp = [14.3, 30.35, 46.4]; 
+Ganhos_Kp = [3.71, 5.49, 7.26]; 
 
 % --- 3. Simulação ---
 figure;
