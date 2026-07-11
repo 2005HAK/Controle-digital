@@ -1,23 +1,32 @@
-\begin{thebibliography}{1}
+\providecommand{\abntreprintinfo}[1]{%
+ \citeonline{#1}}
+\setlength{\labelsep}{0pt}\begin{thebibliography}{}
+\providecommand{\abntrefinfo}[3]{}
+\providecommand{\abntbstabout}[1]{}
+\abntbstabout{v-1.9.7 }
 
-\bibitem{dorf2017}
-R.~C. Dorf and R.~H. Bishop.
-\newblock {\em Modern Control Systems}.
-\newblock Pearson, 13 edition, 2015.
+\bibitem[Antonelli 2014]{antonelli2014}
+\abntrefinfo{Antonelli}{ANTONELLI}{2014}
+{ANTONELLI, G. \emph{Underwater Robots}. 3. ed. Cham: Springer, 2014.}
 
-\bibitem{FoxMcDonald}
-Robert~W. Fox, Alan~T. McDonald, and Philip~J. Pritchard.
-\newblock {\em Introdução à Mecânica dos Fluidos}.
-\newblock LTC, 8 edition, 2014.
+\bibitem[Dorf e Bishop 2015]{dorf2017}
+\abntrefinfo{Dorf e Bishop}{DORF; BISHOP}{2015}
+{DORF, R.~C.; BISHOP, R.~H. \emph{Modern Control Systems}. 13. ed. [S.l.]: Pearson, 2015.}
 
-\bibitem{franklin2015}
-Gene~F. Franklin, J.~David Powell, and Abbas Emami-Naeini.
-\newblock {\em Feedback Control of Dynamic Systems}.
-\newblock Pearson, 8 edition, 2015.
+\bibitem[Fossen 2011]{fossen2011}
+\abntrefinfo{Fossen}{FOSSEN}{2011}
+{FOSSEN, T.~I. \emph{Handbook of Marine Craft Hydrodynamics and Motion Control}. 1. ed. Chichester: John Wiley \& Sons, 2011.}
 
-\bibitem{Ogata}
-Katsuhiko Ogata.
-\newblock {\em Engenharia de Controle Moderno}.
-\newblock Pearson, 5 edition, 2014.
+\bibitem[Fox, McDonald e Pritchard 2014]{fox2014}
+\abntrefinfo{Fox, McDonald e Pritchard}{FOX; MCDONALD; PRITCHARD}{2014}
+{FOX, R.~W.; MCDONALD, A.~T.; PRITCHARD, P.~J. \emph{Introdução à Mecânica dos Fluidos}. 8. ed. Rio de Janeiro: LTC, 2014.}
+
+\bibitem[Franklin, Powell e Emami-Naeini 2015]{franklin2015}
+\abntrefinfo{Franklin, Powell e Emami-Naeini}{FRANKLIN; POWELL; EMAMI-NAEINI}{2015}
+{FRANKLIN, G.~F.; POWELL, J.~D.; EMAMI-NAEINI, A. \emph{Feedback Control of Dynamic Systems}. 8. ed. [S.l.]: Pearson, 2015.}
+
+\bibitem[Ogata 2014]{ogata2014}
+\abntrefinfo{Ogata}{OGATA}{2014}
+{OGATA, K. \emph{Engenharia de Controle Moderno}. 5. ed. [S.l.]: Pearson, 2014.}
 
 \end{thebibliography}
