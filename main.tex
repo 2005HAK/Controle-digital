@@ -6,14 +6,25 @@
 \usepackage{geometry}
 \usepackage{amsfonts, amsmath, amssymb}
 \usepackage{graphicx}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
+\usepackage[alf]{abntex2cite}
 \usepackage{titlesec}
 \usepackage{indentfirst}
 \usepackage{float}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{setspace}
+\usepackage{mathptmx}
+\usepackage{fancyhdr}
 
-\geometry{a4paper, margin={3cm,2cm,2cm,3cm}}
+\pagestyle{fancy}
+\fancyhf{} % Limpa todos os cabeçalhos e rodapés padrão
+\renewcommand{\headrulewidth}{0pt} % Remove a linha preta que o pacote cria no topo
+\fancyhead[R]{\thepage} % Coloca o número da página do lado Direito (R - Right) do Cabeçalho
+
+\onehalfspacing
+
+\geometry{a4paper, left=3cm, top=3cm, right=2cm, bottom=2cm}
 \setlength{\parindent}{1.25cm}
 
 % --- Configuração de Cores e Estilo para MATLAB ---
@@ -51,22 +62,22 @@
 % Força os títulos a terem 12pt (\normalsize) e negrito
 
 \titleformat{\section}
-  {\normalsize\bfseries\MakeUppercase} % formato: 12pt e negrito
-  {\thesection.}         % rótulo (número): "1."
-  {1em}                  % separação: 1 "M" de espaço
-  {}                     % código antes do título (pode deixar vazio)
+	{\normalsize\bfseries\MakeUppercase} % formato: 12pt e negrito
+	{\thesection.}         % rótulo (número): "1."
+	{1em}                  % separação: 1 "M" de espaço
+	{}                     % código antes do título (pode deixar vazio)
 
 \titleformat{\subsection}
-  {\normalsize\MakeUppercase} % formato: 12pt e negrito
-  {\thesubsection.}      % rótulo (número): "1.1."
-  {1em}                  % separação
-  {}                     % código antes
+	{\normalsize\MakeUppercase} % formato: 12pt e negrito
+	{\thesubsection.}      % rótulo (número): "1.1."
+	{1em}                  % separação
+	{}                     % código antes
 
 \titleformat{\subsubsection}
-  {\normalsize\bfseries} % formato: 12pt e negrito
-  {\thesubsubsection.}   % rótulo (número): "1.1.1."
-  {1em}                  % separação
-  {}                     % código antes
+	{\normalsize\bfseries} % formato: 12pt e negrito
+	{\thesubsubsection.}   % rótulo (número): "1.1.1."
+	{1em}                  % separação
+	{}                     % código antes
 
 \newcommand{\universidade}{Universidade Federal de Santa Catarina}
 \newcommand{\centro}{Centro Tecnológico de Joinville - CTJ}
@@ -122,44 +133,57 @@
 		\end{center}
 	\end{titlepage}
 
-	\begin{abstract}
-		Fazer
-		
-		\vspace{1em}
-		\noindent\textbf{Palavras-chave:} AUV, Controle de Profundidade, Estabilidade
-	\end{abstract}
+	\clearpage
+	\begin{center}
+		\normalsize\bfseries\MakeUppercase{Resumo}
+	\end{center}
+
+	O presente trabalho descreve a modelagem matemática e o projeto de um sistema de controle de profundidade para o Veículo Autônomo Subaquático (AUV) Yvy. Devido à não linearidade do ambiente subaquático e às características físicas do veículo, a dinâmica vertical foi isolada e linearizada em torno de um ponto de operação, resultando em uma função de transferência de segunda ordem do Tipo 1. Para garantir a segurança operacional e evitar colisões com o leito marinho, requisitos estritos de desempenho foram estabelecidos, notadamente um sobressinal máximo de $5\%$ e tempo de acomodação inferior a $10$ s. O projeto inicial contemplou um controlador PID contínuo alocado pelo método do Lugar das Raízes, o qual atendeu aos requisitos com alta robustez (Margem de Fase de $86{,}5^\circ$) e rejeição natural a perturbações de flutuabilidade. Posteriormente, visando a implementação embarcada via microcomputador Raspberry Pi e controladora Pixhawk, o sistema foi discretizado com uma frequência de amostragem de $20$ Hz, garantindo o atendimento ao Teorema de Nyquist. A discretização dos controladores PID e DeadBeat evidenciou a importância das restrições físicas em projetos digitais: embora apresentem excelente desempenho matemático, as ações de controle teóricas exigem esforços instantâneos que excedem o limite de saturação de 35 N dos atuadores físicos, demonstrando a necessidade de estratégias de suavização na implementação prática.
+
+	\vspace{1em}
+	\noindent\textbf{Palavras-chave:} AUV, Controle de Profundidade, PID Digital, Discretização, Controlador DeadBeat.
 	\clearpage
 
+	\renewcommand{\contentsname}{\centerline{SUMÁRIO}}
 	\tableofcontents
 	\clearpage
 
 	\section{Introdução}
 
-	Fazer uma introdução
+		A exploração e o monitoramento de ambientes subaquáticos impõem desafios tecnológicos complexos, impulsionando o desenvolvimento de Veículos Autônomos Subaquáticos (AUVs -- \textit{Autonomous Underwater Vehicles}). Estes robôs são capazes de executar missões em ambientes hostis sem a necessidade de intervenção humana direta ou cabos umbilicais, sendo amplamente utilizados em inspeções de infraestruturas submersas, mapeamento oceanográfico e competições de robótica. 
 
-	\section{Definição do sistema}
+		Neste contexto, o presente trabalho documenta o projeto do sistema de controle de profundidade desenvolvido para o AUV Yvy, projetado pela Equipe Terra Competition, projeto de extensão de robótica submarina da Universidade Federal de Santa Catarina (UFSC), Campus Joinville. 
 
-	O sistema sob análise consiste em um Veículo Autônomo Subaquático (AUV -- \textit{Autonomous Underwater Vehicle}) impulsionado por um conjunto de seis propulsores. A configuração de atuadores permite a movimentação no plano horizontal ($xOy$) por meio de quatro thrusters U2 mini e movimento no eixo vertical ($Z$) proporcionado por dois thrusters T100 da BlueRobotics.
+		O controle preciso do eixo vertical (profundidade) é um dos requisitos mais críticos para a navegação autônoma. Um AUV opera em um ambiente onde perturbações não modeladas, correntes de água e uma flutuabilidade propositalmente positiva (por razões de segurança) atuam constantemente contra o veículo. Além disso, falhas no controle de profundidade podem resultar em sobressinais que levam a colisões catastróficas contra o fundo do mar ou do tanque de testes, comprometendo a integridade de sensores caros e a continuidade da missão.
 
-	Estruturalmente, o veículo é caracterizado por dois compartimentos cilíndricos estanques, alinhados longitudinalmente ao eixo $X$. O cilindro superior, de maior volume, aloja os sistemas embarcados e a eletrônica de controle. O cilindro inferior, de menor diâmetro, é destinado ao armazenamento da bateria, contribuindo para a estabilidade passiva do sistema (centro de gravidade abaixo do centro 
-	de empuxo).
-	
-	Diante desta configuração, o objetivo central deste projeto de controle é definido como: \textbf{garantir a estabilização do veículo em uma profundidade de referência especificada a partir de um sistema de controle digital implementado no veículo.}
+		O objetivo principal deste projeto é apresentar o equacionamento, a análise e a sintonia de um controlador digital capaz de estabilizar a profundidade do AUV Yvy em uma referência desejada, respeitando rigorosos limites de segurança e acomodação. 
+
+		Para tanto, este relatório está estruturado da seguinte forma: primeiramente, realiza-se a definição física do sistema e o levantamento de suas hipóteses simplificadoras. Em seguida, a modelagem matemática é desenvolvida a partir das leis de Newton, resultando em uma função de transferência linearizada. Posteriormente, projeta-se um controlador PID no domínio contínuo, validando seu desempenho por meio da análise do Lugar das Raízes e da resposta em frequência (Diagramas de Bode). Por fim, o sistema e os controladores são discretizados para adequação ao hardware embarcado, culminando na análise crítica do desempenho dos controladores PID Digital e DeadBeat frente às limitações físicas de saturação dos propulsores do robô.
+
+	\section{Definição do Sistema}
+
+		O sistema sob análise consiste em um Veículo Autônomo Subaquático (AUV -- \textit{Autonomous Underwater Vehicle}) impulsionado por um conjunto de seis propulsores. A configuração de atuadores permite a movimentação no plano horizontal ($xOy$) por meio de quatro \textit{thrusters} U2 mini, e o movimento no eixo vertical ($Z$) proporcionado por dois \textit{thrusters} T100 da BlueRobotics.
+
+		Estruturalmente, o veículo é caracterizado por dois compartimentos cilíndricos estanques, alinhados longitudinalmente ao eixo $X$. O cilindro superior, de maior volume, aloja os sistemas embarcados e a eletrônica de controle. O cilindro inferior, de menor diâmetro, é destinado ao armazenamento da bateria, contribuindo para a estabilidade passiva do sistema (centro de gravidade abaixo do centro de empuxo).
+
+		Diante desta configuração, o objetivo central deste projeto de controle é definido como: \textbf{garantir a estabilização do veículo em uma profundidade de referência especificada a partir de um sistema de controle digital implementado no próprio veículo.}
 
 		\subsection{Hipóteses de Modelagem}
-			A modelagem matemática do sistema foi obtida com base em algumas hipóteses simplificadoras, que visam capturar a dinâmica essencial do controle de profundidade, ao mesmo tempo em que mantêm a complexidade do modelo em um nível gerenciável para análise e projeto de controladores. As hipóteses adotadas são as seguintes:
+
+			A modelagem matemática do sistema foi obtida com base em hipóteses simplificadoras, que visam capturar a dinâmica essencial do controle de profundidade, ao mesmo tempo em que mantêm a complexidade do modelo em um nível gerenciável para análise e projeto de controladores. As hipóteses adotadas foram as seguintes:
 
 			\begin{itemize}
-				\item \textbf{Desacoplamento dos eixos:} A dinâmica vertical foi analisada isoladamente (1 Grau de Liberdade), assumindo-se que o movimento nos planos horizontal e lateral não influencia significativamente a dinâmica de profundidade;
+				\item \textbf{Desacoplamento dos eixos:} A dinâmica vertical foi analisada isoladamente (1 Grau de Liberdade), assumindo-se que o movimento nos planos horizontal e lateral não influencia significativamente a dinâmica de profundidade, uma premissa amplamente validada na literatura para manobras operacionais de AUVs \cite{fossen2011,antonelli2014};
 
 				\item \textbf{Atuação ideal:} Assumiu-se que a força resultante dos dois propulsores verticais atua diretamente sobre o centro de massa do veículo, não gerando torques de arfagem (\textit{pitch}) ou rolagem (\textit{roll}) indesejados;
 
-				\item \textbf{Sistema de Coordenadas:} Adotou-se o referencial com o eixo $Z$ positivo apontando para baixo (padrão NED - \textit{North-East-Down}), onde o aumento de $Z$ corresponde ao aumento da profundidade;
+				\item \textbf{Sistema de Coordenadas:} Adotou-se o referencial inercial com o eixo $Z$ positivo apontando para baixo, seguindo o padrão NED (\textit{North-East-Down}) da engenharia naval, onde o aumento de $Z$ corresponde ao aumento da profundidade \cite{fossen2011};
 
-				\item \textbf{Hidrostática constante:} O veículo é considerado completamente submerso durante toda a operação, garantindo que o volume deslocado e, consequentemente, a força de empuxo, permaneçam constantes.
+				\item \textbf{Hidrostática constante:} O veículo é considerado completamente submerso durante toda a operação, garantindo que o volume deslocado e, consequentemente, a força de empuxo permaneçam constantes.
 			\end{itemize}
 
 		\subsection{Instrumentação e Sensoriamento}
+
 			A estratégia de controle em malha fechada depende da aquisição precisa dos estados do sistema. O AUV dispõe dos seguintes sensores e métodos para a realimentação:
 
 			\begin{itemize}
@@ -167,20 +191,19 @@
 
 				\item \textbf{Unidade de Medida Inercial (IMU):} Integrada à controladora Pixhawk PX4, fornece dados de aceleração linear ($\ddot{z}$) e velocidade angular;
 
-				\item \textbf{Estimação de Velocidade:} A velocidade vertical ($\dot{z}$) não é medida diretamente, sendo obtida através de técnicas de fusão sensorial (como Filtro de Kalman ou Complementar) que combinam a integração da aceleração com a derivação da posição.
+				\item \textbf{Estimação de Velocidade:} A velocidade vertical ($\dot{z}$) não é medida diretamente, sendo obtida através de técnicas de fusão sensorial (como Filtro de Kalman) que combinam a integração da aceleração com a derivação da posição.
 			\end{itemize}
 
-			Esses são os dados disponíveis para utilização no projeto, sendo que o dado fundamental aqui é a profundidade $z$ medida pela Pixhawk atravez de uma combinação dos dados do sensor de pressão e da IMU, utilizando um filtro de Kalman para obter uma estimativa robusta e precisa da profundidade atual do veículo.
+			Esses são os dados disponíveis para utilização no projeto. O dado fundamental para a malha é a profundidade $z$, estimada pela controladora Pixhawk através de uma combinação dos dados do sensor de pressão e da IMU, utilizando um Filtro de Kalman Estendido (EKF) para obter uma estimativa robusta e precisa da profundidade atual do veículo.
 
 	\section{Modelagem Matemática do Sistema}
 
 		\subsection{Variáveis do Sistema}
 
-			Para o desenvolvimento do modelo matemático de controle de profundidade do AUV, adotou-se variáveis genéricas para representar os parâmetros físicos do veículo. Esta abordagem assegura a robustez e a adaptabilidade do modelo frente a eventuais alterações no projeto mecânico. Os parâmetros fundamentais são:
+			Para o desenvolvimento do modelo matemático de controle de profundidade do AUV, adotaram-se variáveis genéricas para representar os parâmetros físicos do veículo. Esta abordagem assegura a robustez e a adaptabilidade do modelo frente a eventuais alterações no projeto mecânico. Os parâmetros fundamentais são:
 
 			\begin{itemize}
 				\item $\vehicleMass$: Massa total do veículo;
-
 				\item $\vehicleVolume$: Volume total deslocado pelo veículo;
 			\end{itemize}
 
@@ -190,24 +213,21 @@
 
 			\begin{itemize}
 				\item $F_{p}$: Força Peso;
-
 				\item $F_{e}$: Força de Empuxo;
-
 				\item $F_{m}$: Força de Atuação dos Propulsores;
-
 				\item $F_{d}$: Força de Arrasto Hidrodinâmico.
 			\end{itemize}
 
 			Aplicando a Segunda Lei de Newton para o movimento de translação no eixo vertical ($z$), obtém-se o somatório de forças:
 
 			\begin{equation}
-				\sum F = F_{p} - F_{e} + F_{m} - F_{d} = m a
+				\sum F = F_{p} - F_{e} + F_{m} - F_{d} = m \cdot a
 			\end{equation}
 
 			Onde $a = \frac{d^2z}{dt^2}$ representa a aceleração vertical do veículo. Substituindo as expressões correspondentes a cada força:
 
 			\begin{equation}
-				M_t \frac{d^2z}{dt^2} = M_t g - \rho g V_t + F_{m} - B_d \frac{dz}{dt}
+				M_t \cdot \frac{d^2z}{dt^2} = M_t \cdot g - \rho \cdot g \cdot V_t + F_{m} - B_d \cdot \frac{dz}{dt}
 				\label{eq:dinamica_nao_linear}
 			\end{equation}
 
@@ -224,25 +244,25 @@
 			Substituindo estas definições na Equação \ref{eq:dinamica_nao_linear}:
 
 			\begin{equation}
-				M_t \frac{d^2(z_0 + \Delta z)}{dt^2} = (M_t g - \rho g V_t) + (F_{me} + \Delta F_m) - B_d \frac{d(z_0 + \Delta z)}{dt}
+				M_t \cdot \frac{d^2(z_0 + \Delta z)}{dt^2} = (M_t \cdot g - \rho \cdot g \cdot V_t) + (F_{me} + \Delta F_m) - B_d \cdot \frac{d(z_0 + \Delta z)}{dt}
 			\end{equation}
 
-			Considerando que as derivadas das constantes de equilíbrio ($z_0, F_{me}$) são nulas, e sabendo que no equilíbrio estático ($\dot{z}=0, \ddot{z}=0$) a força de sustentação dos motores deve equilibrar o peso aparente do veículo:
+			Considerando que as derivadas das constantes de equilíbrio ($z_0, F_{me}$) são nulas, e sabendo que no equilíbrio estático ($\dot{z}=0, \ddot{z}=0$) a força de sustentação dos motores deve equilibrar o peso aparente do veículo, tem-se:
 
 			\begin{equation}
-				F_{me} = \rho g V_t - M_t g
+				F_{me} = \rho \cdot g \cdot V_t - M_t \cdot g
 				\label{eq:equilibrio_estatico}
 			\end{equation}
 
-			Substituindo a condição de equilíbrio estático (\ref{eq:equilibrio_estatico}) na equação dinâmica (\ref{eq:dinamica_nao_linear}), os termos constantes se cancelam, restando apenas a dinâmica das perturbações:
+			Substituindo a condição de equilíbrio estático (Eq. \ref{eq:equilibrio_estatico}) na equação dinâmica (Eq. \ref{eq:dinamica_nao_linear}), os termos constantes se cancelam, restando apenas a dinâmica das perturbações:
 
 			\begin{equation}
-				M_t \frac{d^2z}{dt^2} = M_t g - \rho g V_t + \rho g V_t - M_t g - B_d \frac{dz}{dt}
+				M_t \cdot \frac{d^2z}{dt^2} = M_t \cdot g - \rho \cdot g \cdot V_t + \rho \cdot g \cdot V_t - M_t \cdot g - B_d \cdot \frac{dz}{dt}
 				\label{eq:dinamica_linearizada_intermediaria}
 			\end{equation}
 
 			\begin{equation}
-				M_t \frac{d^2 \Delta z}{dt^2} + B_d \frac{d \Delta z}{dt} = \Delta F_{m}
+				M_t \cdot \frac{d^2 \Delta z}{dt^2} + B_d \cdot \frac{d \Delta z}{dt} = \Delta F_{m}
 				\label{eq:dinamica_linearizada}
 			\end{equation}
 
@@ -251,87 +271,84 @@
 			Aplicando a Transformada de Laplace na Equação \ref{eq:dinamica_linearizada} e assumindo condições iniciais nulas ($\Delta z(0) = 0$, $\Delta \dot{z}(0) = 0$):
 
 			\begin{equation}
-				M_t s^2 \Delta Z(s) + B_d s \Delta Z(s) = \Delta F_{m}(s)
+				M_t \cdot s^2 \cdot \Delta Z(s) + B_d \cdot s \cdot \Delta Z(s) = \Delta F_{m}(s)
 			\end{equation}
 
 			Fatorando $\Delta Z(s)$, obtém-se a Função de Transferência que relaciona a variação de profundidade com a variação da força de atuação:
 
 			\begin{equation}
-				\frac{\Delta Z(s)}{\Delta F_{m}(s)} = \frac{1}{M_t s^2 + B_d s}
+				\frac{\Delta Z(s)}{\Delta F_{m}(s)} = \frac{1}{M_t \cdot s^2 + B_d \cdot s}
 			\end{equation}
 
 			Para facilitar a análise de controle, a equação é normalizada para a forma padrão:
 
 			\begin{equation}
-				G(s) = \frac{\Delta Z(s)}{\Delta F_{m}(s)} = \frac{1/M_t}{s(s + B_d/M_t)}
+				G(s) = \frac{\Delta Z(s)}{\Delta F_{m}(s)} = \frac{1/M_t}{s \cdot (s + B_d/M_t)}
 				\label{eq:ft_final}
 			\end{equation}
 
-			A análise da Equação \ref{eq:ft_final} revela que a planta é um sistema de {\bfseries segunda ordem do Tipo 1}, caracterizado pela presença de um polo na origem ($s=0$) e um polo real estável em $s = -B_d/M_t$. A presença do integrador natural (polo na origem) implica que o sistema possui erro nulo em regime permanente para uma entrada do tipo degrau de força, dispensando a necessidade de ação integral no controlador para este fim. Desta forma, a estratégia de controle poderá focar em controladores do tipo Proporcional (P) ou Proporcional-Derivativo (PD) para ajuste da resposta transitória.
+			A análise da Equação \ref{eq:ft_final} revela que a planta é um sistema de {\bfseries segunda ordem do Tipo 1}, caracterizado pela presença de um polo na origem ($s=0$) e um polo real estável em $s = -B_d/M_t$. A presença do integrador natural implica que o sistema possui erro nulo em regime permanente para uma entrada do tipo degrau de força, dispensando a necessidade primária de ação integral no controlador para a rejeição de erros constantes de posição \cite{ogata2014}. Desta forma, a estratégia de controle poderá focar primariamente em controladores do tipo Proporcional (P) para o ajuste da resposta transitória.
 
 		\subsection{Determinação dos Parâmetros do Sistema}
 
-			A simulação e o projeto do controlador exigem a determinação mais fidedigna possível dos parâmetros físicos do veículo Yvy. Com base em medições experimentais e dados do projeto mecânico, foram definidos os seguintes valores:
+			A simulação e o projeto do controlador exigiram a determinação fidedigna dos parâmetros físicos do veículo Yvy. Com base em medições experimentais e dados do projeto mecânico, foram definidos os seguintes valores:
 
 			\begin{itemize}
 				\item Massa do veículo ($\vehicleMass$): 19 kg;
-
 				\item Volume deslocado ($\vehicleVolume$): 0,014 m$^3$;
-
 				\item Densidade do fluido ($\rho$): 1000 kg/m$^3$ (água doce);
-
 				\item Aceleração da gravidade ($g$): 9,81 m/s$^2$.
 			\end{itemize}
 
-			A massa foi obtida experimentalmente utilizando uma balança de precisão no Laboratório de Interação Fluido-Estrutura (LIFE) da \universidade. O volume foi extraído diretamente do modelo CAD do veículo (software SolidWorks).
+			A massa foi obtida experimentalmente utilizando uma balança de precisão no Laboratório de Interação Fluido-Estrutura (LIFE) da UFSC Joinville. O volume foi extraído diretamente do modelo CAD do veículo (no software SolidWorks).
 
-				\subsubsection{Coeficiente de Amortecimento Hidrodinâmico}
+			\subsubsection{Coeficiente de Amortecimento Hidrodinâmico}
 
-					A determinação do coeficiente de arrasto linearizado ($B_d$) requer uma análise da hidrodinâmica do veículo. Dada a geometria complexa do AUV, adotou-se a aproximação de um corpo rombudo (cubo) de aresta $L = 0,4$ m, compatível com as dimensões reais de $0,38 \times 0,4 \times 0,38$ m.	
+				A determinação do coeficiente de arrasto linearizado ($B_d$) exigiu uma análise da hidrodinâmica do veículo. Dada a geometria complexa do AUV, adotou-se a aproximação de um corpo rombudo (cubo) de aresta $L = 0,4$ m, compatível com as dimensões reais de $0,38 \times 0,4 \times 0,38$ m.  
 
-					Primeiramente, validou-se a hipótese de regime turbulento. Calculou-se o Número de Reynolds ($Re$) considerando uma velocidade baixa de $v = 0,1$ m/s, representando o início do movimento, e viscosidade dinâmica da água $\mu = 0,001$ Pa.s:
+				Primeiramente, validou-se a hipótese de regime turbulento. Calculou-se o Número de Reynolds ($Re$) considerando uma velocidade baixa de $v = 0,1$ m/s, representando o início do movimento, e a viscosidade dinâmica da água $\mu = 0,001$ Pa$\cdot$s:
 
-					\begin{equation}
-						Re = \frac{\rho \cdot v \cdot L}{\mu} = \frac{1000 \cdot 0,1 \cdot 0,4}{0,001} = 40,000
-					\end{equation}
+				\begin{equation}
+					Re = \frac{\rho \cdot v \cdot L}{\mu} = \frac{1000 \cdot 0,1 \cdot 0,4}{0,001} = 40.000
+				\end{equation}
 
-					Como $Re \gg 10^4$ mesmo em baixas velocidades, confirma-se que o escoamento é predominantemente turbulento, validando o uso de um coeficiente de arrasto constante $C_d \approx 1,05$ para geometria cúbica conforme tabela 9.3 em Fox et al. \cite{FoxMcDonald}.
+				Como $Re \gg 10^4$ mesmo em baixas velocidades, confirmou-se que o escoamento é predominantemente turbulento, validando o uso de um coeficiente de arrasto constante $C_d \approx 1,05$ para geometria cúbica, conforme estabelecido na literatura clássica de mecânica dos fluidos \cite{fox2014}.
 
-					No entanto, a equação dinâmica linearizada (Eq. \ref{eq:dinamica_linearizada}) exige um coeficiente de amortecimento linear ($B_d$), enquanto o arrasto físico é quadrático ($F_d \propto v^2$). Para contornar isso, realizou-se a linearização da força de arrasto em torno de uma velocidade de operação nominal $v_{op} = 0,2$ m/s, sendo este valor foi definido a partir da velocidade terminal do AUV. Sabendo que em conjunto, os motores que controlam o movimento vertical são capazes de entregar aproximadamente $35N$ de força, assim assumiu-se o veículo em velocidade terminal, onde a aceleração é nula e as forças de propulsão e arrasto se equilibram, e fez-se a seguinte substituição na equação de equilíbrio de forças \ref{eq:dinamica_nao_linear}:
+				No entanto, a equação dinâmica linearizada (Eq. \ref{eq:dinamica_linearizada}) exige um coeficiente de amortecimento linear ($B_d$), enquanto o arrasto físico sob regime turbulento é estritamente quadrático ($F_d \propto v^2$). Para contornar essa não linearidade, realizou-se a linearização da força de arrasto em torno de uma velocidade de operação nominal $v_{op}$. Sabendo que, em conjunto, os motores responsáveis pelo movimento vertical são capazes de entregar aproximadamente 35 N de força, assumiu-se que o veículo atinge a velocidade terminal quando a aceleração é nula e as forças de propulsão e arrasto se equilibram. A partir disso, fez-se a seguinte substituição na equação de equilíbrio:
 
-					\begin{equation}
-						F_{d_{linear}} = F_{d_{quadratico}} \implies B_d \cdot \frac{dz}{dt} = \frac{1}{2} \rho \cdot v_{op}^2 \cdot C_d \cdot A
-						\label{eq:linearizacao_arrasto}
-					\end{equation}
+				\begin{equation}
+					F_{d_{linear}} = F_{d_{quadratico}} \implies B_d \cdot \frac{dz}{dt} = \frac{1}{2} \rho \cdot v_{op}^2 \cdot C_d \cdot A
+					\label{eq:linearizacao_arrasto}
+				\end{equation}
 
-					Onde $A = 0,16$ m$^2$ é a área da seção transversal ($0,4 \times 0,4$ m). Com isso foi possivel determinar a velocidade terminal $v_{term} = 0,4090$ m/s e se estabeleceu que a velocidade de operação nominal para linearização seria cerca de 50\% da terminal $v_{op} = 0,2$ m/s, garantindo que o modelo linearizado seja válido em torno da região de operação do veículo.
+				Onde $A = 0,16$ m$^2$ é a área da seção transversal ($0,4 \times 0,4$ m). Com isso, foi possível determinar a velocidade terminal $v_{term} = 0,4090$ m/s. Estabeleceu-se, portanto, que a velocidade de operação nominal para a linearização seria cerca de 50\% da velocidade terminal ($v_{op} = 0,2$ m/s), garantindo que o modelo linearizado seja válido na principal região de operação do veículo.
 
-					Encontrada a velocidade de operação, a linearização da força de arrasto é realizada utilizando a expressão derivada da equação \ref{eq:linearizacao_arrasto}:
+				Com a velocidade de operação definida, a obtenção do coeficiente de arrasto linearizado foi realizada utilizando a expressão derivada da Equação \ref{eq:linearizacao_arrasto}:
 
-					\begin{equation}
-						B_d = \frac{1}{2} \rho \cdot v_{op} \cdot C_d \cdot A
-					\end{equation}
+				\begin{equation}
+					B_d = \frac{1}{2} \rho \cdot v_{op} \cdot C_d \cdot A
+				\end{equation}
 
-					Substituindo os valores:
+				Substituindo os valores:
 
-					\begin{equation}
-						B_d = \frac{1}{2} \cdot 1000 \cdot 0,2 \cdot 1,05 \cdot 0,16 = 16,8 \text{ kg/s (ou Ns/m)}
-					\end{equation}
+				\begin{equation}
+					B_d = \frac{1}{2} \cdot 1000 \cdot 0,2 \cdot 1,05 \cdot 0,16 = 16,8 \text{ kg/s}
+				\end{equation}
 
-					Ressalta-se que o coeficiente $B_d$ calculado é uma aproximação válida nas vizinhanças da velocidade de operação ($0,2$ m/s). Velocidades verticais significativamente superiores resultarão em forças de arrasto maiores do que as previstas pelo modelo linear (amortecimento subestimado), enquanto velocidades inferiores resultarão em forças menores (amortecimento superestimado). O controlador deve, portanto, apresentar robustez suficiente para lidar com essas variações paramétricas.
+				Ressalta-se que o coeficiente $B_d$ calculado é uma aproximação válida estritamente nas vizinhanças da velocidade de operação ($0,2$ m/s). Velocidades verticais significativamente superiores resultarão em forças de arrasto maiores do que as previstas pelo modelo linear (amortecimento subestimado), enquanto velocidades inferiores resultarão em forças menores (amortecimento superestimado). O projeto do controlador deve, portanto, prever margens de robustez suficientes para lidar com essas variações paramétricas não modeladas.
 
 		\subsection{Análise de Estabilidade e Lugar das Raízes}
 
-			Substituindo os parâmetros físicos determinados na seção anterior ($M_t = 19$ kg e $B_d = 16.8$ kg/s) na equação da planta, obtém-se a função de transferência numérica do sistema:
+			Substituindo os parâmetros físicos determinados na seção anterior ($M_t = 19$ kg e $B_d = 16,8$ kg/s) na equação da planta, obteve-se a função de transferência numérica do sistema:
 
 			\begin{equation}
-				G(s) = \frac{\Delta Z(s)}{\Delta F_{m}(s)} = \frac{1/19}{s(s + 16,8/19)} = \frac{0,0526}{s(s + 0,8842)}
+				G(s) = \frac{\Delta Z(s)}{\Delta F_{m}(s)} = \frac{1/19}{s \cdot (s + 16,8/19)} = \frac{0,0526}{s \cdot (s + 0,8842)}
 				\label{eq:ft_numerica}
 			\end{equation}
 
 			A análise dos polos de malha aberta revela raízes em $s_1 = 0$ e $s_2 = -0,8842$. A presença do polo na origem confirma que o sistema é {\bfseries marginalmente estável} em malha aberta, comportando-se como um integrador com amortecimento.
 
-			Para avaliar o comportamento do sistema em malha fechada sob ação de controle, traçou-se o Lugar das Raízes (Root Locus) utilizando o software MATLAB, conforme apresentado na Figura \ref{fig:root_locus_Gs}.
+			Para avaliar o comportamento do sistema em malha fechada sob ação de controle, traçou-se o Lugar das Raízes (\textit{Root Locus}) utilizando o software MATLAB, conforme apresentado na Figura \ref{fig:root_locus_Gs}.
 
 			\begin{figure}[H]
 				\centering
@@ -343,29 +360,29 @@
 				\label{fig:root_locus_Gs}
 			\end{figure}
 
-			A análise do lugar das raízes permite concluir que:
+			A análise do lugar das raízes permitiu concluir que:
 
 			\begin{enumerate}
-				\item {\bfseries Estabilidade Absoluta:} Os ramos do lugar das raízes permanecem inteiramente no semiplano esquerdo complexo para qualquer ganho $K > 0$. Isso indica que o sistema em malha fechada é {\bfseries incondicionalmente estável} com um controlador Proporcional.
+				\item {\bfseries Estabilidade Absoluta:} Os ramos do lugar das raízes permanecem inteiramente no semiplano esquerdo complexo para qualquer ganho proporcional $K > 0$. Isso indica que o sistema em malha fechada é {\bfseries incondicionalmente estável} com um controlador Proporcional.
 
-				\item {\bfseries Comportamento Dinâmico:} Para ganhos baixos, o sistema apresenta polos reais distintos (superamortecido). À medida que o ganho aumenta, os polos convergem para o ponto de separação (em $s \approx -0,442$) e tornam-se complexos conjugados, resultando em uma resposta subamortecida (oscilatória).
+				\item {\bfseries Comportamento Dinâmico:} Para ganhos baixos, o sistema apresenta polos reais distintos (comportamento superamortecido). À medida que o ganho aumenta, os polos convergem para o ponto de separação (em $s \approx -0,4421$) e tornam-se complexos conjugados, resultando em uma resposta subamortecida (oscilatória).
 			\end{enumerate}
 
-			Portanto, valida-se a hipótese de que um controlador do tipo Proporcional (P) é suficiente para estabilizar a profundidade do veículo. A adição de um termo derivativo (PD) também será explorada posteriormente para verificar como a insersão do termo derivativo afeta o desempenho do sistema.
+			Portanto, validou-se a hipótese de que um controlador do tipo Proporcional (P) é suficiente para estabilizar a profundidade do veículo. A adição de um termo derivativo e de um termo integral (PID) também será explorada nas seções seguintes para verificar como a sua inclusão afeta e melhora o amortecimento e o desempenho transitório do sistema.
 
 	\section{Projeto do Controlador}
 
 		\subsection{Definição dos Requisitos de Desempenho}
 
-			Para o projeto do sistema de controle de profundidade, é fundamental estabelecer critérios de desempenho que garantam a operabilidade e a segurança do AUV Yvy. A definição destes requisitos baseia-se nas limitações físicas do veículo, na dinâmica do ambiente subaquático e nas restrições de segurança da missão.
+			Para o projeto do sistema de controle de profundidade, estabeleceram-se critérios de desempenho que garantam a operabilidade e a segurança do AUV Yvy. A definição destes requisitos baseou-se nas limitações físicas do veículo, na dinâmica do ambiente subaquático e nas restrições de segurança da missão.
 
 			\subsubsection{Percentual de Sobressinal}
 
 				A limitação do Percentual de Sobressinal (PSS) é o requisito mais crítico deste projeto, justificado estritamente pela \textbf{segurança operacional e integridade física do veículo}.
 
-				Considerando um cenário operacional onde o AUV deve realizar manobras próximas ao leito marinho ou ao fundo de um tanque de testes, um sobressinal excessivo pode resultar em colisão. Por exemplo, assuma-se uma manobra de descida onde o veículo parte de $z_{ini} = 1,0 \text{ m}$ para uma referência $z_{ref} = 5,0 \text{ m}$, em um local onde a profundidade total é $z_{solo} = 5,2 \text{ m}$.
+				Considerando um cenário operacional onde o AUV deve realizar manobras próximas ao leito marinho ou ao fundo de um tanque de testes, um sobressinal excessivo pode resultar em colisão. Como exemplo, assuma-se uma manobra de descida onde o veículo parte de $z_{ini} = 1,0 \text{ m}$ para uma referência $z_{ref} = 5,0 \text{ m}$, em um local onde a profundidade total é $z_{solo} = 5,2 \text{ m}$.
 
-				Neste caso, a variação de profundidade é:
+				Neste caso, a variação de profundidade é dada por:
 
 				\begin{equation}
 					\Delta z = z_{ref} - z_{ini} = 5,0 - 1,0 = 4,0 \text{ m}
@@ -374,30 +391,30 @@
 				Se o sistema apresentar um sobressinal de apenas $5\%$, a profundidade máxima atingida ($z_{pico}$) será:
 
 				\begin{equation}
-					z_{pico} = z_{ref} + \left(\Delta z \cdot \frac{PSS}{100}\right) = 5,0 + (4,0 \cdot 0,05) = 5,2 \text{ m}
+					z_{pico} = z_{ref} + \Delta z \cdot PSS = 5,0 + 4,0 \cdot 0,05 = 5,2 \text{ m}
 				\end{equation}
 
-				Neste cenário hipotético, o veículo tentaria atingir 5,2 m, o que poderia resultar em uma colisão com o solo. Tal impacto, mesmo em baixa velocidade, pode danificar sensores críticos (DVL, sonar, câmeras) e levantar sedimentos que prejudicam a navegação visual.
+				Neste cenário hipotético, o veículo atingiria a marca de 5,2 m, resultando em uma colisão direta com o solo. Tal impacto, mesmo em baixa velocidade, pode danificar sensores críticos (como DVL, sonares e câmeras) e suspender sedimentos que prejudicam a navegação visual.
 
-				Portanto, define-se como requisito estrito que:
+				Portanto, definiu-se como requisito estrito de projeto que:
 
 				\begin{equation}
-					PSS = 5\%
+					PSS \le 5\%
 				\end{equation}
 
-				Adicionalmente, recomenda-se como regra de segurança que a referência de profundidade nunca exceda $95\%$ da profundidade máxima local ($z_{ref} \le 0,95 \cdot h_{max}$).
+				Adicionalmente, recomendou-se como regra de segurança operacional que a referência de profundidade nunca exceda $95\%$ da profundidade máxima local identificada ($z_{ref} \le 0,95 \cdot h_{max}$).
 
 			\subsubsection{Tempo de Acomodação}
 
-				O tempo de acomodação ($T_s$) define a rapidez de resposta do sistema. Para estipular um valor factível, deve-se considerar a limitação física de velocidade do atuador e do arrasto hidrodinâmico.
+				O tempo de acomodação ($T_s$) define a rapidez de resposta do sistema em malha fechada. Para estipular um valor factível, considerou-se a limitação física de velocidade do atuador e a influência do arrasto hidrodinâmico.
 
-				Assumindo que o veículo varie sua profundidade em $\Delta z = 1 \text{ m}$ e que a velocidade de operação linearizada do modelo é $v_{op} = 0.2 \text{ m/s}$, o tempo mínimo de trânsito físico ($T_{transito}$) para percorrer essa variação é:
+				Assumindo que o veículo varie sua profundidade em $\Delta z = 1 \text{ m}$ e que a velocidade de operação linearizada do modelo seja $v_{op} = 0,2 \text{ m/s}$, o tempo mínimo de trânsito físico ($T_{tr\hat{a}nsito}$) para percorrer essa variação é definido por:
 
 				\begin{equation}
-					T_{transito} = \frac{\Delta z}{v_{op}} = \frac{1}{0,2} = 5 \text{ s}
+					T_{tr\hat{a}nsito} = \frac{\Delta z}{v_{op}} = \frac{1}{0,2} = 5 \text{ s}
 				\end{equation}
 
-				Como o sistema dinâmico necessita de um tempo adicional para acelerar, desacelerar e entrar na margem de 2\% do valor final, define-se uma margem de 100\% do tempo de transito do AUV para se deslocar $1 \text{ m}m$. Assim, o requisito de desempenho temporal é estabelecido como:
+				Como o sistema dinâmico necessita de um período adicional para acelerar, desacelerar e estabilizar dentro da faixa de tolerância de 2\% do valor final, estipulou-se uma margem de segurança de 100\% sobre o tempo de trânsito nominal do AUV para se deslocar por $1 \text{ m}$. Assim, o requisito de desempenho temporal foi estabelecido como:
 
 				\begin{equation}
 					T_s \le 10 \text{ s} \quad \text{(critério de 2\%)}
@@ -405,543 +422,603 @@
 
 			\subsubsection{Erro em Regime Permanente}
 
-				O objetivo fundamental do controle é garantir que o veículo atinja a profundidade desejada com precisão. Portanto, exige-se que:
+				O objetivo fundamental do controle é garantir que o veículo atinja a profundidade desejada com precisão. Portanto, exigiu-se que:
 
 				\begin{equation}
 					e_{ss} = 0 \quad \text{para entrada do tipo degrau}
 				\end{equation}
 
-				Conforme analisado na modelagem matemática, a planta do AUV possui um polo na origem ($1/s$), comportando-se como um integrador puro na relação força-velocidade. Isso classifica o sistema como sendo do \textbf{Tipo 1}. Pela teoria de controle clássico (Tabela 5.1 em Ogata, Katsuhiko \cite{Ogata}), sistemas do Tipo 1 garantem naturalmente erro nulo em regime permanente para entradas em degrau, satisfazendo este requisito estruturalmente sem a necessidade de ação integral adicional no controlador.
+				Conforme analisado na modelagem matemática, a planta do AUV possui um polo na origem ($1/s$), comportando-se como um integrador, o que classifica o sistema como sendo do \textbf{Tipo 1}. Pela teoria de controle clássico \cite{ogata2014}, sistemas do Tipo 1 garantem naturalmente erro nulo em regime permanente para entradas em degrau de posição, satisfazendo este requisito estruturalmente, sem a necessidade mandatória de uma ação integral adicional no controlador para este fim específico.
 
 		\subsection{Análise do Lugar das Raízes e Definição de Ganhos}
 
-			A Figura \ref{fig:root_locus_Gs} apresentou a estabilidade absoluta do sistema para qualquer ganho positivo. Nesta seção, delimitam-se as regiões no plano complexo que satisfazem os requisitos de desempenho temporal estabelecidos, permitindo a seleção do ganho $K_p$ adequado.
+			A Figura \ref{fig:root_locus_Gs} ilustrou a estabilidade absoluta do sistema para qualquer ganho positivo. Nesta seção, delimitaram-se as regiões no plano complexo que satisfazem os requisitos de desempenho temporal estabelecidos, o que permitiu a seleção do ganho $K_p$ adequado para o controlador.
 
 			A função de transferência de malha fechada para o controlador proporcional é dada por:
 
 			\begin{equation}
-				\frac{\Delta Z(s)}{\Delta Z_{ref}(s)} = \frac{0,0526 K_p}{s^2 + 0,8842s + 0,0526 K_p}
+				\frac{\Delta Z(s)}{\Delta Z_{ref}(s)} = \frac{0,0526 \cdot K_p}{s^2 + 0,8842 \cdot s + 0,0526 \cdot K_p}
 			\end{equation}
 
-			Comparando o denominador com a forma padrão de segunda ordem ($s^2 + 2\zeta\omega_n s + \omega_n^2$), identificam-se as relações:
+			Comparando o denominador da equação com a forma padrão de um sistema de segunda ordem ($s^2 + 2 \cdot \zeta \cdot \omega_n \cdot s + \omega_n^2$), identificam-se as seguintes relações fundamentais:
 
 			\begin{equation}
-				\omega_n^2 = 0,0526K_p \quad \text{e} \quad 2 \zeta \omega_n = 0,8842
+				\omega_n^2 = 0,0526K_p \quad \text{e} \quad 2 \cdot \zeta \cdot \omega_n = 0,8842
 				\label{eq:params_mf}
 			\end{equation}
 
 			\subsubsection{Região de Tempo de Acomodação}
 
-			O requisito de tempo de acomodação ($T_s \le 10$ s, critério de 2\%) impõe uma restrição sobre a parte real dos polos ($\sigma = \zeta\omega_n$):
+				O requisito de tempo de acomodação ($T_s \le 10$ s, critério de 2\%) impõe uma restrição sobre a parte real dos polos ($\sigma = \zeta \cdot \omega_n$):
 
-			\begin{equation}
-				T_s \approx \frac{4}{\zeta \omega_n} \le 10 \implies \zeta \omega_n \ge 0,4
-			\end{equation}
+				\begin{equation}
+					T_s \approx \frac{4}{\zeta \cdot \omega_n} \le 10 \implies \zeta \cdot \omega_n \ge 0,4
+				\end{equation}
 
-			Como os polos estáveis possuem parte real negativa, a condição no plano complexo é:
+				Como os polos estáveis possuem parte real negativa, a condição no plano complexo é definida por:
 
-			\begin{equation}
-				\text{Re}(s) \le -0,4
-			\end{equation}
+				\begin{equation}
+					\text{Re}(s) \le -0,4
+				\end{equation}
 
-			Observando o Lugar das Raízes, nota-se que a parte real dos polos complexos é fixa em $-0,422$. Como $-0,422 < -0,4$, o requisito de tempo de acomodação é {\bfseries naturalmente satisfeito para qualquer ganho} que resulte em polos complexos, conforme ilustrado na Figura \ref{fig:TsRegion}.
+				Observando o Lugar das Raízes, nota-se que a parte real dos ramos complexos é fixa em $-0,4421$. Como $-0,4421 < -0,4$, o requisito de tempo de acomodação é \textbf{naturalmente satisfeito para qualquer ganho} que resulte em polos complexos, conforme ilustrado na Figura \ref{fig:TsRegion}.
 
-			\begin{figure}[H]
-				\centering
-				\caption{Lugar das Raízes com destaque para a região que atende ao requisito de $T_s \le 10s$ (área verde).}
+				\begin{figure}[H]
+					\centering
+					\caption{Lugar das Raízes com destaque para a região onde $T_s \le 10$ s (área verde).}
 
-				\includegraphics[width=0.9 \textwidth]{img/TsRegion.jpg}
+					\includegraphics[width=0.9 \textwidth]{img/TsRegion.jpg}
 
-				\textit{\footnotesize Fonte: Do autor}
-				\label{fig:TsRegion}
-			\end{figure}
+					\textit{\footnotesize Fonte: Do autor}
+					\label{fig:TsRegion}
+				\end{figure}
 
 			\subsubsection{Região de Sobressinal}
 
-			O requisito de sobressinal máximo ($PSS \le 5\%$) impõe uma restrição sobre o coeficiente de amortecimento $\zeta$. Utilizando a relação analítica:
+				O requisito de sobressinal máximo ($PSS \le 5\%$) impõe uma restrição geométrica sobre o coeficiente de amortecimento $\zeta$. Utilizando a relação analítica de sistemas de segunda ordem \cite{dorf2017}:
 
-			\begin{equation}
-				\zeta \ge \frac{|\ln(PSS)|}{\sqrt{\pi^2 + \ln^2(PSS)}}
-			\end{equation}
+				\begin{equation}
+					\zeta \ge \frac{|\ln(PSS)|}{\sqrt{\pi^2 + \ln^2(PSS)}}
+				\end{equation}
 
-			Para $PSS = 0,05$, tem-se:
+				Para $PSS = 0,05$, tem-se:
 
-			\begin{equation}
-				\zeta \ge 0.6901
-			\end{equation}
+				\begin{equation}
+					\zeta \ge 0,6901
+				\end{equation}
 
-			Geometricamente, isso define um cone no plano complexo delimitado pelo ângulo $\phi$ em relação ao 
-			eixo real negativo:
+				Geometricamente, isso define um cone no plano complexo delimitado pelo ângulo $\phi$ em relação ao eixo real negativo:
 
-			\begin{equation}
-				\phi = \arccos(\zeta) = \arccos(0.6901) \approx 46,36^\circ
-			\end{equation}
+				\begin{equation}
+					\phi = \arccos(\zeta) = \arccos(0,6901) \approx 46,36^\circ
+				\end{equation}
 
-			Portanto, os polos de malha fechada devem possuir um ângulo tal que $0 \le \phi \le 46,36^\circ$. A Figura \ref{fig:PSSTSRegion} apresenta a intersecção das regiões que atendem simultaneamente aos requisitos de tempo e sobressinal.
+				Portanto, os polos de malha fechada devem possuir um ângulo tal que $0 \le \phi \le 46,36^\circ$. A Figura \ref{fig:PSSTSRegion} apresenta a intersecção das regiões que atendem simultaneamente aos requisitos de tempo e de sobressinal.
 
-			\begin{figure}[H]
-				\centering
-				\caption{Região de operação válida atendendo a $T_s$ (verde) e $PSS$ (azul).}
+				\begin{figure}[H]
+					\centering
+					\caption{Região de operação válida atendendo a $T_s$ (verde) e $PSS$ (azul).}
 
-				\includegraphics[width=0.9 \textwidth]{img/PSSTSRegion.jpg}
+					\includegraphics[width=0.9 \textwidth]{img/PSSTSRegion.jpg}
 
-				\textit{\footnotesize Fonte: Do autor}
-				\label{fig:PSSTSRegion}
-			\end{figure}
+					\textit{\footnotesize Fonte: Do autor}
+					\label{fig:PSSTSRegion}
+				\end{figure}
 
 			\subsubsection{Seleção do Ganho}
 
-			Com base na região válida identificada, determinou-se a faixa de ganhos que mantém os polos dentro do cone de amortecimento. A análise gráfica indica que o sistema atende aos requisitos para:
+				Com base na região válida identificada, determinou-se a faixa de ganhos que mantém os polos dentro do cone de amortecimento. A análise gráfica indicou que o sistema atende aos requisitos teóricos para a faixa:
 
-			\begin{equation}
-				14,3 \le K_p \le 46,4
-			\end{equation}
+				\begin{equation}
+					3,71 \le K_p \le 7,26
+				\end{equation}
 
-			A Figura \ref{fig:testesKps} apresenta a simulação da resposta ao degrau para três valores distintos dentro e nas fronteiras desta faixa.
+				A Figura \ref{fig:testesKps} apresenta a simulação da resposta ao degrau para três valores distintos posicionados dentro e nas fronteiras desta faixa.
 
-			\begin{figure}[H]
-				\centering
-				\caption{Simulação da resposta ao degrau unitário para diferentes ganhos $K_p$.}
+				\begin{figure}[H]
+					\centering
+					\caption{Simulação da resposta ao degrau unitário para diferentes ganhos $K_p$.}
 
-				\includegraphics[width=1 \textwidth]{img/testesKps.jpg}
+					\includegraphics[width=1 \textwidth]{img/TestesKps.jpeg}
 
-				\textit{\footnotesize Fonte: Do autor}
-				\label{fig:testesKps}
-			\end{figure}
+					\textit{\footnotesize Fonte: Do autor}
+					\label{fig:testesKps}
+				\end{figure}
 
-			A análise das respostas temporais permite as seguintes conclusões:
+				A análise das respostas temporais permitiu as seguintes conclusões:
 
-			\begin{itemize}
-				\item $K_p = 14,3$: Resposta conservadora e superamortecida. Atende aos requisitos, mas é a mais lenta.
+				\begin{itemize}
+					\item $K_p = 3,71$: Gera uma resposta conservadora e próxima ao regime superamortecido. Embora atenda facilmente ao requisito de sobressinal, a perda do comportamento dominante complexo resulta em uma acomodação excessivamente lenta na prática simulada ($T_s \approx 13,2$ s), violando a premissa de rapidez;
 
-				\item $K_p = 46,4$: Resposta no limite da especificação de sobressinal ($PSS \approx 5\%$). 	Embora rápida, apresenta risco de violar os requisitos caso haja incertezas na modelagem da planta.
+					\item $K_p = 7,26$: Apresenta resposta no limite superior da especificação de sobressinal ($PSS \approx 5\%$). Embora seja uma resposta rápida, apresenta elevado risco de violar os requisitos reais caso haja incertezas na modelagem da planta física;
 
-				\item $K_p = 30,35$: Valor intermediário escolhido para o projeto. Apresenta um excelente 
-				compromisso entre velocidade (acomodação em $< 4s$) e amortecimento (sem sobressinal significativo).
-			\end{itemize}
+					\item $K_p = 5,49$: Valor intermediário escolhido para o projeto. Apresenta um excelente compromisso entre velocidade (acomodação em $\approx 7$ s) e amortecimento (sem sobressinal significativo).
+				\end{itemize}
 
-			Optou-se, portanto, pelo ganho $K_p = 30,35$. Esta escolha confere {\bfseries robustez} ao sistema de controle, garantindo uma margem de segurança contra incertezas paramétricas (como variações no arrasto hidrodinâmico) e evitando a saturação excessiva dos propulsores, mantendo o desempenho bem dentro das especificações de projeto.
+				Optou-se, portanto, pela adoção do ganho $K_p = 5,49$. Esta escolha confere \textbf{robustez} ao sistema de controle, garantindo uma margem de segurança contra incertezas paramétricas (como variações de densidade do fluido e arrasto hidrodinâmico) e prevenindo a saturação excessiva dos atuadores. Tendo em vista que os motores saturam com uma atuação de 35 N, a utilização deste ganho assegura que o veículo suporte uma variação de profundidade instantânea em degrau de até $6,38$ m sem perda de linearidade, mantendo o desempenho rigorosamente dentro das especificações do projeto.
 
 		\subsection{Controlador PID}
 
-		Apesar da análise teórica em malha fechada demonstrar que um controlador puramente Proporcional (P) é capaz de estabilizar o sistema linearizado, a implementação prática no veículo exige uma arquitetura de controle mais robusta para lidar com perturbações físicas não modeladas.
+			Apesar de a análise teórica em malha fechada demonstrar que um controlador puramente Proporcional (P) é capaz de estabilizar o sistema linearizado, a implementação prática no veículo exige uma arquitetura de controle mais robusta para lidar com perturbações físicas não modeladas.
 
-		Por questões de segurança operacional, o AUV Yvy foi projetado com flutuabilidade levemente positiva, garantindo que o veículo retorne naturalmente à superfície em caso de falha de energia. Esta flutuabilidade atua como uma perturbação constante que empurra o veículo para cima. Sob a ação de um controlador Proporcional puro, os propulsores verticais apenas geram força se houver um erro de profundidade ativo. Consequentemente, o veículo nunca atingiria a referência exata, sendo forçado a estabilizar alguns centímetros acima do alvo (erro em regime permanente) para que o sistema gere o empuxo necessário para contrabalançar a flutuabilidade.
+			Por questões de segurança operacional, o AUV Yvy foi projetado com flutuabilidade levemente positiva, garantindo que o veículo retorne naturalmente à superfície em caso de falha de energia. Esta flutuabilidade atua como uma perturbação constante que empurra o veículo para cima. Sob a ação de um controlador Proporcional puro, os propulsores verticais apenas gerariam força se houvesse um erro de profundidade ativo. Consequentemente, o veículo nunca atingiria a referência exata, sendo forçado a estabilizar alguns centímetros acima do alvo (erro em regime permanente) para que o sistema gerasse o empuxo necessário para contrabalançar a flutuabilidade.
 
-		Para anular este erro estacionário, torna-se indispensável a introdução de uma ação Integral (I), que acumula o erro ao longo do tempo e gera o esforço de controle constante exigido para manter o equilíbrio hidrostático na cota desejada. No entanto, a adição de um integrador aumenta o tipo do sistema e insere um atraso de fase na malha, tornando a resposta transitória significativamente mais oscilatória. Para compensar essa degradação de estabilidade e atuar como um amortecimento ativo, introduziu-se também a ação Derivativa (D), consolidando a estrutura de um controlador PID \cite{Ogata, dorf2017}.
+			Para anular este erro estacionário, tornou-se indispensável a introdução de uma ação Integral (I), que acumula o erro ao longo do tempo e gera o esforço de controle constante exigido para manter o equilíbrio hidrostático na cota desejada. No entanto, a adição de um integrador aumenta o tipo do sistema e insere um atraso de fase na malha, tornando a resposta transitória significativamente mais oscilatória. Para compensar essa degradação de estabilidade e atuar como um amortecimento ativo, introduziu-se também a ação Derivativa (D), consolidando a estrutura de um controlador PID \cite{ogata2014, dorf2017}.
 
-		A função de transferência clássica do controlador PID é definida por:
-
-		\begin{equation}
-			C(s) = K_p + \frac{K_i}{s} + K_d s
-		\end{equation}
-
-		Para fins de projeto pelo Lugar das Raízes, a função de transferência é manipulada algebricamente para evidenciar a presença de um polo na origem e dois zeros ajustáveis:
-
-		\begin{equation}
-			C(s) = \frac{K_d s^2 + K_p s + K_i}{s} = \frac{K(s - z_1)(s - z_2)}{s}
-			\label{eq:pidzeros}
-		\end{equation}
-
-		onde $K$ é o ganho geral do controlador e $z_1, z_2$ são os zeros ajustáveis.
-
-		\subsubsection{Alocação dos Zeros por Cancelamento de Polos e Condição de Ângulo}
-
-		Os parâmetros da malha foram determinados mediante a alocação criteriosa dos zeros do controlador, visando forçar os polos dominantes de malha fechada a convergirem para a região específica do plano complexo $S$ que satisfaça simultaneamente os requisitos de sobressinal máximo ($\text{PSS} \leq 5\%$) e tempo de acomodação ($T_s \leq 10$ s).
-
-		\paragraph{Primeiro zero (cancelamento de polo):}
-
-		A estratégia de projeto adotada baseou-se inicialmente no método de cancelamento de polos, fundamento clássico do projeto por Lugar das Raízes \cite{franklin2015}. O primeiro zero do controlador foi posicionado em $z_1 = -0,8842$ de forma a anular o polo não-integrador da dinâmica da planta. Com este cancelamento aproximado, o sistema em malha aberta passa a possuir uma dinâmica dominada por um polo duplo na origem (um proveniente da planta e outro do integrador do controlador), restando um único grau de liberdade para posicionar o segundo zero ($z_2$).
-
-		\paragraph{Segundo zero (condição de ângulo do Lugar das Raízes):}
-
-		A posição do segundo zero foi definida analiticamente utilizando o \textit{Critério de Ângulo} do Lugar das Raízes \cite{Ogata}. Primeiramente, definiu-se o ponto de operação desejado no plano complexo $s_d = \sigma + j\omega_d$ para atender simultaneamente aos requisitos de projeto. As restrições especificam:
-
-		\begin{itemize}
-			\item Tempo de acomodação: $T_s \leq 10$ s $\Rightarrow$ $\sigma \leq -0,4$ rad/s
-			\item Coeficiente de amortecimento: $\zeta \geq 0,6901$ $\Rightarrow$ $\theta = \arccos(\zeta) \leq 46,36^\circ$
-		\end{itemize}
-
-		O ponto crítico escolhido para projeto foi $s_d = -0,4 + j0,4195$ (vértice da região de desempenho válida), que satisfaz simultaneamente ambas as restrições.
-
-		Para que os polos de malha fechada transitem por este ponto $s_d$, a condição de ângulo do Lugar das Raízes estabelece que a soma vetorial dos ângulos deve resultar em um múltiplo ímpar de $180^\circ$ \cite{Ogata}:
-
-		\begin{equation}
-			\sum \angle(s_d - z_i) - \sum \angle(s_d - p_i) = (2k+1) \cdot 180^\circ
-		\end{equation}
-
-		Após o cancelamento de $z_1$ com o polo em $-0{,}8842$, o sistema efetivo possui dois polos na origem. A contribuição angular de cada polo é:
-
-		\begin{equation}
-			\phi_p = \angle(s_d - 0) = \arctan{\frac{\omega_d}{\sigma}}
-		\end{equation}
-
-		Para satisfazer a condição de ângulo, o segundo zero deve fornecer um ângulo de:
-
-		\begin{equation}
-			\phi_{z_2} = 180^\circ + 2\phi_p = 180^\circ + 2 \cdot \arctan{\frac{\omega_d}{\sigma}}
-		\end{equation}
-
-		Como o zero $z_2$ deve estar necessariamente no eixo real (propriedade fundamental do Lugar das Raízes), sua posição é determinada unicamente pela relação geométrica:
-
-		\begin{equation}
-			z_2 = \sigma - \frac{\omega_d}{\tan(\phi_{z_2})}
-		\end{equation}
-
-		Substituindo os valores do ponto de projeto ($\sigma = -0{,}4$, $\omega_d = 0{,}4195$):
-
-		\begin{equation}
-			\phi_{z_2} = 180^\circ + 2 \cdot \arctan{\frac{0,4195}{-0,4}} \approx 180^\circ + 2 \cdot \left(-92,73^\circ\right) = 87,27^\circ
-		\end{equation}
-
-		\begin{equation}
-			z_2 = -0,4 - \frac{0,4195}{\tan(87,27^\circ)} \approx -0,42
-		\end{equation}
-
-		\subsubsection{Cálculo do Ganho Mínimo e Ajuste Final}
-
-		O ganho $K$ associado ao cruzamento do Lugar das Raízes pelo ponto $s_d$ foi calculado pela condição de módulo:
-
-		\begin{equation}
-			|K| = \frac{|s_d| \cdot |s_d|}{|s_d - z_1| \cdot |s_d - z_2|} = K_{\min} \approx 15{,}21
-		\end{equation}
-
-		Este valor $K_{\min}$ representa o ganho teórico mínimo necessário para que os polos de malha fechada alcancem o vértice da região especificada. No entanto, essa análise presume que o sistema permanece de segunda ordem em regime. Na prática, após a alocação dos dois zeros do PID, o sistema em malha aberta apresenta uma estrutura de terceira ordem:
-
-		\begin{equation}
-			L(s) = C(s) \cdot G(s) = \frac{K(s-z_1)(s-z_2)}{s} \cdot \frac{0,0526}{s^2 + 0,8842s}
-		\end{equation}
-
-		A presença do polo duplo na origem e a dinâmica não-cancelada da planta (após o cancelamento aproximado de $z_1$) fazem com que a resposta ao degrau em malha fechada seja governada por uma característica dinâmica de ordem superior àquela pressuporida na análise do Lugar das Raízes tradicional. Portanto, o ganho mínimo teórico não é suficiente para atender simultaneamente aos requisitos de sobressinal e tempo de acomodação na resposta transitória.
-
-		Deste modo, o valor de $K$ foi ajustado manualmente através de simulação da resposta ao degrau unitário até que o sobressinal ficasse abaixo de $5\%$. Nesse ponto de operação, o ganho encontrado foi $K = 130$, resultando em:
-
-		\begin{equation}
-			K_p = K(z_1 + z_2) = 130 \cdot (0,8842 + 0,42) = 169,5406
-		\end{equation}
-
-		\begin{equation}
-			K_i = K \cdot z_1 \cdot z_2 = 130 \cdot (0,8842 \cdot 0,42) = 48,2725
-		\end{equation}
-
-		\begin{equation}
-			K_d = K = 130
-		\end{equation}
-
-		A resposta ao degrau com estes ganhos é apresentada na Figura \ref{fig:Resposta_controlador_PID}, onde se observa um sobressinal de $5\%$ e tempo de acomodação reduzido para $T_s = 2,6$ s, evidenciando que o controlador não apenas atende aos requisitos originais (PSS $\leq 5\%$, $T_s \leq 10$ s) como também oferece desempenho superior ao inicialmente especificado.
-
-		\begin{figure}[H]
-			\centering
-			\caption{Resposta ao degrau unitário com controlador PID sintonizado.}
-			
-			\includegraphics[width=0.8\textwidth]{img/respostaPID.jpg}
-			
-			\vspace{.5em}
-			\textit{\footnotesize Fonte: Do autor}
-			\label{fig:Resposta_controlador_PID}
-		\end{figure}
-
-		\subsection{Análise de Resposta em Frequência}
-
-		Com a planta e o controlador definidos, realizou-se a análise da resposta em frequência para avaliar a estabilidade relativa e a robustez do sistema em malha fechada \cite{Ogata}. Para isso, foram obtidos os Diagramas de Bode da função de transferência de malha aberta $L(s)$ e de malha fechada $H(s)$, considerando os ganhos escolhidos $K_p = 169,5406$, $K_i = 48,2725$ e $K_d = 130$.
-
-		A função de transferência de malha aberta é dada por:
-
-		\begin{equation}
-			L(s) = C(s) \cdot G(s) = \frac{130(s-0{,}8842)(s-0{,}42)}{s} \cdot \frac{0{,}0526}{s(s + 0{,}8842)}
-			\label{eq:malha_aberta}
-		\end{equation}
-
-		Após a simplificação algébrica (cancelamento do fator $(s+0{,}8842)$ entre numerador e denominador):
-
-		\begin{equation}
-			L(s) = \frac{130 \cdot 0{,}0526 \cdot (s-0{,}42)}{s^2} = \frac{6{,}838(s-0{,}42)}{s^2}
-			\label{eq:malha_aberta_simplificada}
-		\end{equation}
-
-		As Figuras \ref{fig:resposta_em_frequencia_MA} e \ref{fig:resposta_em_frequencia_MF} apresentam, respectivamente, os diagramas de Bode de malha aberta e fechada obtidos via simulação numérica em MATLAB.
-
-		\begin{figure}[H]
-			\centering
-			\caption{Diagrama de Bode de malha aberta $L(s)$: magnitude e fase.}
-			
-			\includegraphics[width=1\textwidth]{img/bodeMA.jpg}
-			
-			\vspace{.5em}
-			\textit{\footnotesize Fonte: Do autor}
-			\label{fig:resposta_em_frequencia_MA}
-		\end{figure}
-
-		\begin{figure}[H]
-			\centering
-			\caption{Diagrama de Bode de malha fechada $H(s)$: magnitude e fase.}
-			
-			\includegraphics[width=1\textwidth]{img/BodeMF.jpg}
-			
-			\vspace{.5em}
-			\textit{\footnotesize Fonte: Do autor}
-			\label{fig:resposta_em_frequencia_MF}
-		\end{figure}
-
-		\subsubsection{Margens de Estabilidade}
-
-		A \textbf{Margem de Ganho (MG)} é avaliada na frequência de cruzamento de fase ($\omega_{pc}$), onde a resposta em fase atinge exatamente $-180^\circ$ \cite{Ogata,dorf2017}. Analisando o diagrama de fase da Figura \ref{fig:resposta_em_frequencia_MA}, observa-se que, devido à estrutura do sistema (dois polos na origem), a fase em alta frequência tende assintoticamente para:
-
-		\begin{equation}
-			\lim_{\omega \to \infty} \angle L(j\omega) = -180^\circ - 2 \cdot 90^\circ = -360^\circ
-		\end{equation}
-
-		No entanto, a fase inicial em baixas frequências é determinada pelo zero em $z_2 = -0{,}42$, que contribui com $+90^\circ$. Deste modo, a fase total passa por $-180^\circ$ para uma frequência finita. O ganho nessa frequência de cruzamento determina a margem de ganho.
-
-		Pela análise do diagrama de Bode (Figura \ref{fig:resposta_em_frequencia_MA}), observa-se que em $\omega_{pc}$ (onde $\angle L = -180^\circ$), a magnitude é negativa em dB, indicando que a Margem de Ganho é positiva e finita. Isto confirma que o sistema é estável, mas com uma tolerância limitada a aumentos de ganho \cite{Ogata}.
-
-		A \textbf{Margem de Fase (MF)} é avaliada na frequência de cruzamento de ganho ($\omega_{gc}$), onde a magnitude cruza por $0$ dB \cite{Ogata}. Pela análise do diagrama e cálculo numérico:
-
-		\begin{equation}
-			\omega_{gc} \approx 6{,}85 \text{ rad/s}
-		\end{equation}
-
-		\begin{equation}
-			\angle L(j\omega_{gc}) \approx -95{,}5^\circ
-		\end{equation}
-
-		Portanto, a Margem de Fase é:
-
-		\begin{equation}
-			MF = 180^\circ + \angle L(j\omega_{gc}) = 180^\circ - 95{,}5^\circ = 84{,}5^\circ
-		\end{equation}
-
-		Este valor elevado de Margem de Fase (acima do mínimo recomendado de $45^\circ$ para sistemas embarcados \cite{dorf2017}) indica que o sistema em malha fechada é altamente robusto contra variações de parâmetros e perturbações não modeladas. Há uma relação aproximada entre Margem de Fase e coeficiente de amortecimento de malha fechada:
-
-		\begin{equation}
-			\zeta_{\text{MF}} \approx \frac{MF}{100} = 0{,}845
-		\end{equation}
-
-		o que confirma um amortecimento adequado e respostas bem comportadas sem oscilações excessivas.
-
-		\paragraph{Tolerância a Atrasos de Tempo:}
-
-		A Margem de Fase também determina a tolerância do sistema a atrasos puros de tempo ($\tau_{delay}$), como aqueles introduzidos por processamento digital, sensores e atuadores:
-
-		\begin{equation}
-			\tau_{delay,\text{máx}} = \frac{MF_{\text{rad}}}{\omega_{gc}} = \frac{84{,}5^\circ \cdot \frac{\pi}{180^\circ}}{6{,}85} \approx 0{,}215 \text{ s}
-		\end{equation}
-
-		O sistema em malha fechada suporta atrasos de até aproximadamente $215$ ms antes de se tornar instável. Considerando que os atrasos reais do hardware (sensores de pressão, atuadores, processamento embarcado) são tipicamente da ordem de $10$--$50$ ms, o controlador apresenta margem confortável para operação prática \cite{dorf2017}.
-
-		\subsubsection{Largura de Banda}
-
-		A \textbf{Largura de Banda ($\omega_{BW}$)} do sistema em malha fechada (Figura \ref{fig:resposta_em_frequencia_MF}) é a frequência na qual o ganho em malha fechada cai para $-3$ dB em relação ao ganho em regime permanente (DC) \cite{Ogata}. O valor obtido foi:
-
-		\begin{equation}
-			\omega_{BW} \approx 7{,}24 \text{ rad/s} \approx 1{,}15 \text{ Hz}
-		\end{equation}
-
-		A largura de banda caracteriza a velocidade de resposta e a capacidade de rastreamento do sistema em malha fechada. Um valor de $\omega_{BW} \approx 7$ rad/s significa que o AUV consegue rastrear com precisão comandos de referência que variem em frequências abaixo de aproximadamente $1{,}15$ Hz, atuando como um \textbf{filtro passa-baixas natural} para frequências superiores.
-
-		Esta característica é benéfica para a aplicação prática por duas razões:
-
-		\begin{enumerate}
-			\item \textbf{Filtragem de ruído:} O sistema naturalmente atenua ruídos de alta frequência provenientes dos sensores de pressão e depth sensors, melhorando a qualidade das medições e reduzindo oscilações da malha de controle.
-			
-			\item \textbf{Rejeição de perturbações rápidas:} Flutuações rápidas no campo de velocidades da água (turbulências, ondas internas) que variam em frequências superiores a $1{,}15$ Hz são naturalmente rejeitadas, já que a inércia do AUV não permite que o veículo as acompanhe. Isso evita desgaste desnecessário dos propulsores e mantém a trajetória suave e estável.
-		\end{enumerate}
-
-		\paragraph{Resumo das métricas de robustez:}
-
-		Os valores exatos extraídos via software MATLAB estão compilados na Tabela \ref{tab:metricas_robustez}:
-
-		\begin{table}[H]
-			\centering
-			\caption{Métricas de robustez e desempenho do sistema em malha fechada.}
-			\begin{tabular}{|l|c|}
-				\hline
-				\textbf{Parâmetro} & \textbf{Valor} \\
-				\hline
-				Margem de Ganho (MG) & finita (estável) \\
-				Margem de Fase (MF) & $86{,}49^\circ$ \\
-				Frequência de Cruzamento de Ganho ($\omega_{gc}$) & $6{,}85$ rad/s \\
-				Largura de Banda ($\omega_{BW}$) & $7{,}24$ rad/s ($\approx 1{,}15$ Hz) \\
-				Atraso máximo tolerado & $\approx 0{,}215$ s \\
-				Coeficiente de amortecimento (via MF) & $\zeta \approx 0{,}85$ \\
-				\hline
-			\end{tabular}
-			\label{tab:metricas_robustez}
-		\end{table}
-
-		Estas métricas confirmam que o controlador projetado oferece uma combinação equilibrada entre rastreamento rápido (tempo de acomodação curto) e robustez contra incertezas, tornando-o adequado para aplicações práticas em ambientes subaquáticos onde perturbações não modeladas são inevitáveis.
-
-	\section{Discretização do sistema}
-
-		Toda a analise até este ponto foi feita no mundo continuo, mas isso não pode ser implementado no veículo. Para que a Yvy possa ser efetivamente controlada é necessário discretizar o sistema para que isto possa ser inserido na Raspberry Pi que a controla.
-
-		\subsection{Tempo de amostragem}
-			
-			Para determinar o tempo de amostragem ideal para capturar a dinâmica do sistema foram analisados os seguintes aspectos: constante de tempo do polo mais rapido da planta e a analise da resposta do sistema pelo diagrama de bode quando foi determinada a largura de banda do sistema.
-
-			A partir da equação \ref{eq:ft_final} verifica-se que a planta possui dois polos, um em $s=0$, que é o integrador natural do sistema, e outro em $s=-\frac{B_d}{\vehicleMass} = - 2,2105$. Quanto mais a esquerda do gráfico mais rápido é o polo, portanto o polo em $s=-2.2305$ apresenta a dinamica mais rápida, apresentanto uma consatante de tempo de:
+			A função de transferência clássica do controlador PID é definida por:
 
 			\begin{equation}
-				\tau_{s2} = \frac{1}{|s_2|} = \frac{1}{2,2105} = 0,4524 s
+				C(s) = K_p + \frac{K_i}{s} + K_d \cdot s
+			\end{equation}
+
+			Para fins de projeto pelo Lugar das Raízes, a função de transferência é manipulada algebricamente para evidenciar a presença de um polo na origem e dois zeros ajustáveis:
+
+			\begin{equation}
+				C(s) = \frac{K_d \cdot s^2 + K_p \cdot s + K_i}{s} = \frac{K \cdot (s - z_1)(s - z_2)}{s}
+				\label{eq:pidzeros}
+			\end{equation}
+
+			onde $K$ é o ganho geral do controlador e $z_1, z_2$ são os zeros ajustáveis.
+
+			\subsubsection{Alocação dos Zeros por Cancelamento de Polos e Condição de Ângulo}
+
+				Os parâmetros da malha foram determinados mediante a alocação criteriosa dos zeros do controlador, visando forçar os polos dominantes de malha fechada a convergirem para a região específica do plano complexo $s$ que satisfaz simultaneamente os requisitos de sobressinal máximo ($\text{PSS} \leq 5\%$) e tempo de acomodação ($T_s \leq 10$ s).
+
+				\paragraph{Primeiro zero (cancelamento de polo):}
+
+					A estratégia de projeto adotada baseou-se inicialmente no método de cancelamento de polos, fundamento clássico do projeto por Lugar das Raízes \cite{franklin2015}. O primeiro zero do controlador foi posicionado em $z_1 = -0{,}8842$ de forma a anular o polo não-integrador da dinâmica da planta. Com este cancelamento aproximado, o sistema em malha aberta passa a possuir uma dinâmica dominada por um polo duplo na origem (um proveniente da planta e outro do integrador do controlador), restando um único grau de liberdade para posicionar o segundo zero ($z_2$).
+
+				\paragraph{Segundo zero (condição de ângulo do Lugar das Raízes):}
+
+					A posição do segundo zero foi definida analiticamente utilizando o \textit{Critério de Ângulo} do Lugar das Raízes \cite{ogata2014}. Primeiramente, definiu-se o ponto de operação desejado no plano complexo $s_d = \sigma + j\omega_d$ para atender simultaneamente aos requisitos de projeto. As restrições especificam:
+
+					\begin{itemize}
+						\item Tempo de acomodação: $T_s \leq 10$ s $\Rightarrow$ $\sigma \leq -0{,}4$ rad/s
+						\item Coeficiente de amortecimento: $\zeta \geq 0{,}6901$ $\Rightarrow$ $\theta = \arccos(\zeta) \leq 46{,}36^\circ$
+					\end{itemize}
+
+					O ponto crítico escolhido para o projeto foi $s_d = -0{,}4 + j0{,}4195$ (vértice da região de desempenho válida), que satisfaz simultaneamente ambas as restrições.
+
+					Para que os polos de malha fechada transitem por este ponto $s_d$, a condição de ângulo do Lugar das Raízes estabelece que a soma vetorial dos ângulos deve resultar em um múltiplo ímpar de $180^\circ$ \cite{ogata2014}:
+
+					\begin{equation}
+						\sum \angle(s_d - z_i) - \sum \angle(s_d - p_i) = (2k+1) \cdot 180^\circ
+					\end{equation}
+
+					Após o cancelamento de $z_1$ com o polo em $-0{,}8842$, o sistema efetivo possui dois polos na origem. A contribuição angular de cada polo é:
+
+					\begin{equation}
+						\phi_p = \angle(s_d - 0) = \arctan{\frac{\omega_d}{\sigma}}
+					\end{equation}
+
+					Para satisfazer a condição de ângulo, o segundo zero deve fornecer um ângulo de:
+
+					\begin{equation}
+						\phi_{z_2} = 180^\circ + 2\phi_p = 180^\circ + 2 \cdot \arctan{\frac{\omega_d}{\sigma}}
+					\end{equation}
+
+					Como o zero $z_2$ deve estar necessariamente no eixo real (propriedade fundamental do Lugar das Raízes), sua posição é determinada unicamente pela relação geométrica:
+
+					\begin{equation}
+						z_2 = \sigma - \frac{\omega_d}{\tan(\phi_{z_2})}
+					\end{equation}
+
+					Substituindo os valores do ponto de projeto ($\sigma = -0{,}4$, $\omega_d = 0{,}4195$):
+
+					\begin{equation}
+						\phi_{z_2} = 180^\circ + 2 \cdot \arctan{\frac{0{,}4195}{-0{,}4}} \approx 180^\circ + 2 \cdot \left(-92{,}73^\circ\right) = 87{,}27^\circ
+					\end{equation}
+
+					\begin{equation}
+						z_2 = -0{,}4 - \frac{0{,}4195}{\tan(87{,}27^\circ)} \approx -0{,}42
+					\end{equation}
+
+			\subsubsection{Cálculo do Ganho Mínimo e Ajuste Final}
+
+				O ganho $K$ associado ao cruzamento do Lugar das Raízes pelo ponto $s_d$ foi calculado pela condição de módulo:
+
+				\begin{equation}
+					|K| = \frac{|s_d| \cdot |s_d|}{|s_d - z_1| \cdot |s_d - z_2|} \implies K_{\min} \approx 15{,}2091
+				\end{equation}
+
+				Este valor $K_{\min}$ representa o ganho teórico mínimo necessário para que os polos de malha fechada alcancem o vértice da região especificada. No entanto, essa análise pressupõe que o sistema permanece de segunda ordem em regime. Na prática, após a alocação dos dois zeros do PID, o sistema em malha aberta apresenta uma estrutura de terceira ordem:
+
+				\begin{equation}
+					L(s) = C(s) \cdot G(s) = \frac{K(s-z_1)(s-z_2)}{s} \cdot \frac{0{,}0526}{s^2 + 0{,}8842s}
+				\end{equation}
+
+				A presença do polo duplo na origem e a dinâmica não cancelada da planta (após o cancelamento aproximado de $z_1$) fazem com que a resposta ao degrau em malha fechada seja governada por uma característica dinâmica de ordem superior àquela pressuposta na análise do Lugar das Raízes tradicional. Portanto, o ganho mínimo teórico não é suficiente para atender simultaneamente aos requisitos de sobressinal e de tempo de acomodação na resposta transitória.
+
+				Deste modo, o valor de $K$ foi ajustado manualmente através de simulação da resposta ao degrau unitário até que o sobressinal ficasse abaixo de $5\%$. Nesse ponto de operação, o ganho encontrado foi $K = 130$, resultando em:
+
+				\begin{equation}
+					K_p = K(-(z_1 + z_2)) = 130 \cdot (0{,}8842 + 0{,}42) = 169{,}5406
+				\end{equation}
+
+				\begin{equation}
+					K_i = K \cdot z_1 \cdot z_2 = 130 \cdot (0{,}8842 \cdot 0{,}42) = 48{,}2725
+				\end{equation}
+
+				\begin{equation}
+					K_d = K = 130
+				\end{equation}
+
+				A resposta ao degrau com estes ganhos é apresentada na Figura \ref{fig:Resposta_controlador_PID}, onde se observa um sobressinal de $5\%$ e um tempo de acomodação reduzido para $T_s = 2{,}52$ s, evidenciando que o controlador não apenas atende aos requisitos originais (PSS $\leq 5\%$, $T_s \leq 10$ s) como também oferece desempenho superior ao inicialmente especificado.
+
+				\begin{figure}[H]
+					\centering
+					\caption{Resposta ao degrau unitário com controlador PID sintonizado.}
+					
+					\includegraphics[width=0.8\textwidth]{img/respostaPID.jpg}
+					
+					\vspace{.5em}
+					\textit{\footnotesize Fonte: Do autor}
+					\label{fig:Resposta_controlador_PID}
+				\end{figure}
+
+			\subsection{Análise de Resposta em Frequência}
+
+				Com a planta e o controlador definidos, realizou-se a análise da resposta em frequência para avaliar a estabilidade relativa e a robustez do sistema em malha fechada \cite{ogata2014}. Para isso, foram obtidos os Diagramas de Bode da função de transferência de malha aberta $L(s)$ e de malha fechada $H(s)$, considerando os ganhos escolhidos $K_p = 169{,}5406$, $K_i = 48{,}2725$ e $K_d = 130$.
+
+				A função de transferência de malha aberta é dada por:
+
+				\begin{equation}
+					L(s) = C(s) \cdot G(s) = \frac{130 \cdot (s+0{,}8842) \cdot (s+0{,}42)}{s} \cdot \frac{0{,}0526}{s \cdot (s + 0{,}8842)}
+					\label{eq:malha_aberta}
+				\end{equation}
+
+				Após a simplificação algébrica (cancelamento do fator $(s+0{,}8842)$ entre numerador e denominador):
+
+				\begin{equation}
+					L(s) = \frac{130 \cdot 0{,}0526 \cdot (s+0{,}42)}{s^2} = \frac{6{,}838(s+0{,}42)}{s^2}
+					\label{eq:malha_aberta_simplificada}
+				\end{equation}
+
+				As Figuras \ref{fig:resposta_em_frequencia_MA} e \ref{fig:resposta_em_frequencia_MF} apresentam, respectivamente, os diagramas de Bode de malha aberta e fechada obtidos via simulação numérica no MATLAB.
+
+				\begin{figure}[H]
+					\centering
+					\caption{Diagrama de Bode de malha aberta $L(s)$: Magnitude e fase.}
+					
+					\includegraphics[width=1\textwidth]{img/bodeMA.jpg}
+					
+					\vspace{.5em}
+					\textit{\footnotesize Fonte: Do autor}
+					\label{fig:resposta_em_frequencia_MA}
+				\end{figure}
+
+				\begin{figure}[H]
+					\centering
+					\caption{Diagrama de Bode de malha fechada $H(s)$: magnitude e fase.}
+					
+					\includegraphics[width=1\textwidth]{img/BodeMF.jpg}
+					
+					\vspace{.5em}
+					\textit{\footnotesize Fonte: Do autor}
+					\label{fig:resposta_em_frequencia_MF}
+				\end{figure}
+
+				\subsubsection{Margens de Estabilidade}
+
+					A \textbf{Margem de Ganho (MG)} é avaliada na frequência de cruzamento de fase ($\omega_{pc}$), onde a resposta em fase atinge exatamente $-180^\circ$ \cite{ogata2014, dorf2017}. Analisando o diagrama de fase da Figura \ref{fig:resposta_em_frequencia_MA}, observa-se que, devido à estrutura do sistema (dois polos na origem), a fase em baixas frequências inicia-se em $-180^\circ$ e tende assintoticamente para $-90^\circ$ em altas frequências pela atuação do zero em $z_2 = -0{,}42$. 
+
+					\begin{equation}
+						\lim_{\omega \to \infty} \angle L(j\omega) = -180^\circ + 90^\circ = -90^\circ
+					\end{equation}
+
+					O ganho nessa frequência de cruzamento determina a margem de ganho. Pela análise do diagrama de Bode (Figura \ref{fig:resposta_em_frequencia_MA}), observa-se que o sistema nunca cruza a fase de $-180^\circ$ de cima para baixo, indicando que a Margem de Ganho é \textbf{infinita}, o que confirma a estabilidade absoluta do sistema em malha fechada.
+
+					A \textbf{Margem de Fase (MF)} é avaliada na frequência de cruzamento de ganho ($\omega_{gc}$), onde a magnitude cruza por $0$ dB \cite{ogata2014}. Pela análise do diagrama e cálculo numérico:
+
+					\begin{equation}
+						\omega_{gc} \approx 6{,}85 \text{ rad/s}
+					\end{equation}
+
+					\begin{equation}
+						\angle L(j\omega_{gc}) \approx -93{,}5^\circ
+					\end{equation}
+
+					Portanto, a Margem de Fase é:
+
+					\begin{equation}
+						MF = 180^\circ + \angle L(j\omega_{gc}) = 180^\circ - 93{,}5^\circ = 86{,}5^\circ
+					\end{equation}
+
+					Este valor elevado de Margem de Fase (acima do mínimo recomendado de $45^\circ$ para sistemas embarcados \cite{dorf2017}) indica que o sistema em malha fechada é altamente robusto contra variações de parâmetros e perturbações não modeladas. Há uma relação aproximada entre Margem de Fase e coeficiente de amortecimento de malha fechada:
+
+					\begin{equation}
+						\zeta_{\text{MF}} \approx \frac{MF}{100} = 0{,}865
+					\end{equation}
+
+					O que confirma um amortecimento adequado e respostas bem comportadas sem oscilações excessivas.
+
+					\paragraph{Tolerância a Atrasos de Tempo:}
+
+						A Margem de Fase também determina a tolerância do sistema a atrasos puros de tempo ($\tau_{delay}$), como aqueles introduzidos por processamento digital, sensores e atuadores:
+
+						\begin{equation}
+							\tau_{delay,\text{máx}} = \frac{MF_{\text{rad}}}{\omega_{gc}} = \frac{86{,}5^\circ \cdot \frac{\pi}{180^\circ}}{6{,}85} \approx 0{,}220 \text{ s}
+						\end{equation}
+
+						O sistema em malha fechada suporta atrasos de até aproximadamente $220$ ms antes de se tornar instável. Considerando que os atrasos reais do hardware (sensores de pressão, atuadores, processamento embarcado) são tipicamente da ordem de $10$ a $50$ ms, o controlador apresenta uma margem confortável para operação prática \cite{dorf2017}.
+
+				\subsubsection{Largura de Banda}
+
+					A \textbf{Largura de Banda ($\omega_{BW}$)} do sistema em malha fechada (Figura \ref{fig:resposta_em_frequencia_MF}) é a frequência na qual o ganho em malha fechada cai para $-3$ dB em relação ao ganho em regime permanente (DC) \cite{ogata2014}. O valor obtido foi:
+
+					\begin{equation}
+						\omega_{BW} \approx 7{,}24 \text{ rad/s} \approx 1{,}15 \text{ Hz}
+					\end{equation}
+
+					A largura de banda caracteriza a velocidade de resposta e a capacidade de rastreamento do sistema em malha fechada. Um valor de $\omega_{BW} \approx 7$ rad/s significa que o AUV consegue rastrear com precisão comandos de referência que variem em frequências abaixo de aproximadamente $1{,}15$ Hz, atuando como um \textbf{filtro passa-baixas natural} para frequências superiores.
+
+					Esta característica é benéfica para a aplicação prática por duas razões:
+
+					\begin{enumerate}
+						\item \textbf{Filtragem de ruído:} O sistema naturalmente atenua ruídos de alta frequência provenientes dos sensores de pressão, melhorando a qualidade das medições e reduzindo oscilações da malha de controle.
+						
+						\item \textbf{Rejeição de perturbações rápidas:} Flutuações rápidas no campo de velocidades da água (turbulências, ondas internas) que variam em frequências superiores a $1{,}15$ Hz são naturalmente rejeitadas, já que a inércia do AUV não permite que o veículo as acompanhe. Isso evita desgaste desnecessário dos propulsores e mantém a trajetória suave e estável.
+					\end{enumerate}
+
+					\paragraph{Resumo das métricas de robustez:}
+
+						Os valores exatos extraídos via software MATLAB estão compilados na Tabela \ref{tab:metricas_robustez}:
+
+						\begin{table}[H]
+							\centering
+							\caption{Métricas de robustez e desempenho do sistema em malha fechada.}
+							\begin{tabular}{|l|c|}
+								\hline
+								\textbf{Parâmetro} & \textbf{Valor} \\
+								\hline
+								Margem de Ganho (MG) & Infinita (estável) \\
+								Margem de Fase (MF) & $86{,}4924^\circ$ \\
+								Frequência de Cruzamento de Ganho ($\omega_{gc}$) & $6{,}8513$ rad/s \\
+								Largura de Banda ($\omega_{BW}$) & $7{,}2413$ rad/s ($\approx 1{,}15$ Hz) \\
+								Atraso máximo tolerado & $\approx 0{,}220$ s \\
+								Coeficiente de amortecimento (via MF) & $\zeta \approx 0{,}865$ \\
+								\hline
+							\end{tabular}
+							\label{tab:metricas_robustez}
+						\end{table}
+
+						Estas métricas confirmam que o controlador projetado oferece uma combinação equilibrada entre rastreamento rápido (tempo de acomodação curto) e robustez contra incertezas, tornando-o adequado para aplicações práticas em ambientes subaquáticos onde perturbações não modeladas são inevitáveis.
+
+	\section{Discretização do Sistema}
+
+		Toda a análise até este ponto foi realizada no domínio contínuo, mas este modelo abstrato não pode ser implementado diretamente no veículo. Para que a Yvy possa ser efetivamente controlada, foi necessário discretizar o sistema para que a lei de controle pudesse ser inserida no microcomputador Raspberry Pi responsável pela operação.
+
+		\subsection{Tempo de Amostragem}
+			
+			Para determinar o tempo de amostragem ideal capaz de capturar a dinâmica do sistema, foram analisados os seguintes aspectos: a constante de tempo do polo mais rápido da planta e a resposta em frequência (largura de banda) do sistema em malha fechada.
+
+			A partir da Equação \ref{eq:ft_final}, verifica-se que a planta possui dois polos: um em $s=0$, que é o integrador natural do sistema, e outro em $s=-\frac{B_d}{\vehicleMass} = -0{,}8842$. Quanto mais à esquerda no plano complexo, mais rápido é o polo. Portanto, o polo em $s=-0{,}8842$ apresenta a dinâmica transitória mais rápida, com uma constante de tempo $\tau$ de:
+
+			\begin{equation}
+				\tau_{s2} = \frac{1}{|s_2|} = \frac{1}{0{,}8842} \approx 1{,}1310 \text{ s}
 				\label{eq:constante_de_tempo_s2}
 			\end{equation}
 
-			Com isto, segundo o teorema de Nyquist o tempo de amostragem deve ser dado por:
+			Com base nisso, o Teorema da Amostragem de Nyquist-Shannon estabelece que o tempo de amostragem máximo teórico deve ser \cite{franklin2015}:
 
 			\begin{equation}
-				T_s > 2\tau_{s2}
+				T_s < \frac{\tau_{s2}}{2}
 			\end{equation}
 
-			Isto, teoricamente garante que não haverá perda de informação ao discretizar o sinal. Apesar disso, uma pratica comum é utilizar um tempo de amostragem entre 10 e 30 vezes menor que a menor constante de tempo da planta. Assim, o tempo de amostragem pela analise dos polos da planta é dado por:
+			Isto, teoricamente, garante que não haverá perda de informação fundamental ao discretizar o sinal (aliasing). Apesar disso, uma prática comum e recomendada em engenharia de controle é utilizar um tempo de amostragem entre 10 e 30 vezes menor que a menor constante de tempo dominante da planta \cite{franklin2015}. Assim, o tempo de amostragem imposto pela análise dos polos da planta é dado por:
 
 			\begin{equation}
-				0,1 \tau \le T_s \le 0,3 \tau \implies 0,04524s \le T_s \le 0,01508s
+				\frac{\tau_{s2}}{30} \le T_s \le \frac{\tau_{s2}}{10} \implies 0{,}0377 \text{ s} \le T_s \le 0{,}1131 \text{ s}
 			\end{equation}
 
-			Desta forma a frequência de amostragem deve estar no intervalo:
+			Desta forma, a frequência de amostragem correspondente deve estar no intervalo:
 
 			\begin{equation}
-				22,1045 Hz \le f_s \le 66,3130 Hz
+				8{,}8417 \text{ Hz} \le f_s \le 26{,}5251 \text{ Hz}
 			\end{equation}
 
-			Outra forma de avaliar o tempo de amostragem é a partir do diagrama de bode, mais especificamente analisando a largura de banda. Isto ja foi determinado anteriomente para o sistema em malha fechada com o controlador proporcional com $K_p = 30,35$, onde verificou-se que o AUV atua naturalmente como um filtro passa baixas com frequencia de corte $f_c = 0,16 Hz$. Com base nessa frequência, pode-se utilizar o mesmo critério da frequência de amostragem estar entre 10 e 30 vezes este valor, logo:
+			Outra forma robusta de avaliar o tempo de amostragem é a partir do Diagrama de Bode, mais especificamente analisando a largura de banda em malha fechada ($\omega_{BW}$). Isto foi determinado anteriormente para o sistema com o controlador PID, onde se verificou que o AUV atua naturalmente como um filtro passa-baixas com frequência de corte $f_c \approx 1{,}15$ Hz. Com base nesta frequência, aplicando o mesmo critério prático de amostragem (10 a 30 vezes a frequência de banda passante), tem-se:
 
 			\begin{equation}
-				1,6Hz \le f_s \le 4,8Hz
+				11{,}5 \text{ Hz} \le f_s \le 34{,}5 \text{ Hz}
 			\end{equation}
 
-			Assim, é possivel verificar que a dinâmica da planta exige uma frequência de amostragem maior do que a exigida com o controlador proporcional, logo o ideal é a escolha de uma frequência de amostragem que atenda a planta.
-
-			Obviamente, não adianta somente determintar que a frequência de amostragem deve estar dentro daquele intervalo, é necessário verificar se o hardware suporta amostrar os dados nessa velocidade. 
-
-			A pixhawk envia mensagens via protocolo Mavlink constantemente, cada tipo de mensagem carrega algums informações de sensores. Os dados necessarios para o controle de profundidade podem ser obtidos de duas maneiras/mensagens distintas:
+			Assim, é possível verificar que a dinâmica da planta em malha aberta exige uma frequência de amostragem ligeiramente menor do que a exigida quando o sistema opera sob o controlador PID. Logo, o ideal é a escolha de uma frequência de amostragem que atenda ao critério mais restrito (o do controlador). Obviamente, não basta apenas determinar a faixa matemática ideal; foi necessário verificar se o hardware embarcado suportava amostrar e processar os dados nessa velocidade.
+			
+			A controladora Pixhawk envia mensagens via protocolo Mavlink constantemente, onde cada tipo de mensagem carrega informações de diferentes sensores. Os dados necessários para o controle de profundidade podem ser obtidos de duas mensagens distintas:
 
 			\begin{enumerate}
-				\item \textbf{SCALED\_PRESSURE2:} Nesta mensagem são enviados dados do sensor de pressão em $hPa$ (hectopascal).
-
-				\item \textbf{LOCAL\_POSITION\_NED:} Nesta mensagem são enviados dados de posição em $m$ (metros) em relação a posição inicial do AUV.
+				\item \textbf{SCALED\_PRESSURE2:} Nesta mensagem, são enviados os dados brutos do sensor de pressão em hPa (hectopascal).
+				\item \textbf{LOCAL\_POSITION\_NED:} Nesta mensagem, são enviados os dados de posição já processados em metros (m) em relação à posição inicial de referência do AUV.
 			\end{enumerate}
 
-			O primeiro método exige pegar os dados de pressão e converter profundidade, exigindo processamento na raspberry, já o segundo método o valor de profundidade é repassado diretamente e é baseado tanto no sensor de pressão quanto nos acelerometros e giroscópios, entregando um dado muito mais preciso do que se fosse pelo primeiro método. Visto isto, é melhor a utilização da segunda mensagem. 
+			O primeiro método exige a aquisição dos dados de pressão e sua conversão matemática para profundidade, exigindo processamento adicional na Raspberry Pi. Já o segundo método entrega o valor de profundidade diretamente, sendo fundamentado na fusão sensorial (Filtro de Kalman) dos dados de pressão com os acelerômetros e giroscópios da IMU, resultando em um dado significativamente mais preciso e limpo. Diante disso, optou-se pela utilização da segunda mensagem. 
 
-			Definido o método, é necessário determinar a velocidade com que esses dados são enviados. Esse é um parametro configurável e, analisando a documentação da pixhawk, as mensagens de \textit{LOCAL\_POSITION\_NED} podem ter uma taxa de envio definida entre 1Hz e 10Hz via firmware da pixhawk, como o Ardupilot, mas esse valor pode ser aumentado até 100Hz enviando uma mensagem de configuração via Mavlink ou acessando o cartão SD e modificando o arquivo de configuração diretamente.
+			Definido o método de leitura, foi necessário determinar a velocidade com que esses dados poderiam ser atualizados. Esse é um parâmetro configurável. Analisando a documentação da Pixhawk, as mensagens do tipo \texttt{LOCAL\_POSITION\_NED} podem ter uma taxa de envio padrão definida entre 1 Hz e 10 Hz via \textit{firmware} de controle de voo (como o ArduPilot). Contudo, esse limite pode ser expandido para até 100 Hz enviando uma mensagem de requisição de fluxo via Mavlink ou modificando os parâmetros de telemetria diretamente no cartão SD.
 
-			Para não saturar a comunicação, visto que mais mensagens são enviadas pela pixhawk, e tambem para não estressar demais o processador da mesma, sera utilizada a taxa maxima que o firmware do Ardupilot permite, ou seja, 10Hz.
+			Para não saturar o barramento de comunicação — visto que dezenas de outras mensagens de telemetria são enviadas simultaneamente pela Pixhawk — e também para não causar estrangulamento de processamento na Raspberry Pi, foi adotada uma taxa de atualização de \textbf{20 Hz}. 
 
-			Analisando sob a óptica dos polos da planta esse valor esta abaixo do recomendado pela literatura, sendo somente $\approx 5$ vezes menor que a constante de tempo do polo mais rápido, logo a discretização do sistema pode ficar um pouco degradada, mas ainda assim atende ao teorema de Nyquist, garantindo que não haverá perda de informação.
+			Analisando sob a ótica do controlador e da dinâmica da planta ($T_s = 0{,}05$ s), este valor adotado cruza com precisão a intersecção das faixas recomendadas tanto pela constante de tempo quanto pela largura de banda, garantindo folga excepcional em relação ao Teorema de Nyquist.
 
-		\subsection{Discretização da planta}
+		\subsection{Discretização da Planta}
 
-			Determinado o tempo de amostragem é necessário discretizar a planta para que o controlador possa ser implementado digitalmente. Para tanto, a deve-se lembrar que a planta no dominio continuo é dada por:
-
-			\begin{equation}
-				G(s) = \frac{\Delta Z(s)}{\Delta F_{m}(s)} = \frac{1/19}{s(s + 42/19)} = \frac{0,0526}{s(s + 2,2105)}
-			\end{equation}
-
-			Discretizando a planta utilizando as transformadas Z tabeladas:
+			Uma vez determinado o tempo de amostragem, tornou-se necessário discretizar a planta para que o controlador pudesse ser implementado digitalmente. Para tanto, relembra-se que a função de transferência da planta no domínio contínuo é dada por:
 
 			\begin{equation}
-				G(z) = \frac{z-1}{z}Z\{\frac{0,0526}{s^2(s+ 2,2105)}\}
+				G(s) = \frac{\Delta Z(s)}{\Delta F_{m}(s)} = \frac{1/19}{s(s + 16{,}8/19)} = \frac{0{,}0526}{s(s + 0{,}8842)}
 			\end{equation}
 
-			Trabalhando com o termo onde a transformada Z é aplicada tem-se:
+			A discretização da planta assume a presença de um conversor Digital-Analógico (DAC), cujo comportamento é modelado matematicamente pelo Segurador de Ordem Zero (ZOH -- \textit{Zero-Order Hold}). Aplicando a definição do ZOH e utilizando as tabelas de Transformada $\mathcal{Z}$ \cite{ogata2014}, tem-se:
+
+			\begin{equation}
+				G(z) = (1 - z^{-1})\mathcal{Z}\left\{\frac{G(s)}{s}\right\} = \frac{z-1}{z}\mathcal{Z}\left\{\frac{0{,}0526}{s^2(s + 0{,}8842)}\right\}
+			\end{equation}
+
+			Expandindo em frações parciais o termo interno no qual a Transformada $\mathcal{Z}$ é aplicada, obteve-se:
 
 			\begin{align}
-				Z\{\frac{0,0526}{s^2(s+ 2,2105)}\}
-				&= \frac{0,0526}{2,2105^2}\left(-\frac{1}{s}+\frac{1}{s + 2,2105} + \frac{2,2105}{s^2}\right) \\
-				&= \frac{0,0526}{2,2105^2}\left(-\frac{z}{z-1} + \frac{z}{z-e^{-0,22105}} + \frac{0,1z}{(z-1)^2}\right) \\
-				&= \frac{0,0526\left(0,02273z^2+0,02111z\right)}{2,2105^2(z-1)^2(z-e^{-0,22105})}
+				\mathcal{Z}\left\{\frac{0{,}0526}{s^2(s+ 0{,}8842)}\right\}
+				&= \frac{0{,}0526}{0{,}8842^2}\mathcal{Z}\left\{-\frac{1}{s}+\frac{1}{s + 0{,}8842} + \frac{0{,}8842}{s^2}\right\} \\
+				&= \frac{0{,}0526}{0{,}8842^2}\left(-\frac{z}{z-1} + \frac{z}{z-e^{-0{,}04421}} + \frac{0{,}04421z}{(z-1)^2}\right) \\
+				&= \frac{0{,}0526\left(0{,}00101z^2+0{,}0009z\right)}{0{,}8842^2(z-1)^2(z-e^{-0{,}04421})}
 			\end{align}
 
-			Substituindo na equação da planta discreta:
+			Substituindo este resultado de volta na equação da planta discreta completa:
 
 			\begin{equation}
-				G(z) = \frac{0,0526\left(0,02273z+0,02111\right)}{2,2105^2(z-1)(z-e^{-0,22105})}
+				G(z) = \frac{0{,}0526\left(0{,}00101z+0{,}0009\right)}{0{,}8842^2(z-1)(z-e^{-0{,}04421})}
 			\end{equation}
 
-			Com isto, pode-se verificar que a planta discreta passou a ter um zero que não existia na planta contínua. Plotando o Lugar das Raízes da planta discreta, é possível verificar que a planta ja não é mais estável para qualquer ganho positivo como era antes, visto que o zero esta puxando os polos para fora do circulo unitário, como ilustrado na Figura \ref{fig:Lugar_das_raizes_Gz_10hz}.
+			Com isto, verifica-se que a planta discreta passou a ter um zero no numerador que não existia na planta contínua original. Esse zero adicional surge intrinsecamente devido ao atraso de fase introduzido pelo Segurador de Ordem Zero durante o processo de retenção do sinal \cite{ogata2014}. 
+			
+			Plotando o Lugar das Raízes da planta discreta, foi possível constatar que o sistema já não é mais incondicionalmente estável para qualquer ganho positivo como era no domínio $s$. Isso ocorre porque o novo zero está puxando os ramos dos polos para fora do círculo unitário em altos ganhos, conforme ilustrado na Figura \ref{fig:Lugar_das_raizes_Gz_20hz}.
 
 			\begin{figure}[H]
 				\centering
 				\caption{Lugar das Raízes da planta discreta $G(z)$.}
 
-				\includegraphics[width=0.9 \textwidth]{img/LugarDasRaizesGz10hz.jpeg}
+				\includegraphics[width=0.9 \textwidth]{img/LugarDasRaizesGz20hz.jpeg}
 
 				\vspace{.5em}
 				\textit{\footnotesize Fonte: Do autor}
-				\label{fig:Lugar_das_raizes_Gz_10hz}
+				\label{fig:Lugar_das_raizes_Gz_20hz}
 			\end{figure}
 
-			Como é possivel verificar graficamente, a planta discreta com $T_s=0,1s$ possui um zero em $z=-0,9287$ o que faz com que a planta so seja estável para ganhos na faixa de $0 < K_p \le 754$. Outro teste que pode ser feito é verificar o efeito de subir a frequência de amostragem para $T_s=0.015s$ que é quase 30 vezes menor que a constante de tempo do polo mais rápido e um valor que não deve estressar demais o hardware.
+			Como é possível verificar gráfica e analiticamente, a planta discreta operando com $T_s=0{,}05$ s possui um zero posicionado em $z=-0{,}8911$. Essa configuração impõe um limite físico e matemático ao sistema, o que faz com que a planta discreta só permaneça estável para ganhos proporcionais restritos à faixa de $0 < K_p \le 578$.
 
-			\begin{figure}[H]
-				\centering
-				\caption{Lugar das Raízes da planta discreta $G(z)$ com $T_s=0,015s$.}
+		\subsection{Controlador PID}
 
-				\includegraphics[width=0.9 \textwidth]{img/LugarDasRaizesGz66hz.jpeg}
+			Com a planta discretizada, o controlador PID calculado anteriormente também pode ser discretizado para verificar se a modelagem no domínio $s$ continua sendo apropriada para a aplicação digitalizada.
 
-				\vspace{.5em}
-				\textit{\footnotesize Fonte: Do autor}
-				\label{fig:Lugar_das_raizes_Gz_66hz}
-			\end{figure}
-
-			Com esta frequência de amostragem é possivel verificar que o ganho aceito pela planta discreta é muito maior, ficando na faixa de $0 < K_p \le 5120$.
-		
-		\subsection{Controlador Proporcional}
-
-			Com a planta discretizada, o controlador proporcional também deve ser discretizado para que possa ser implementado digitalmente. A função de transferência do controlador proporcional é dada por:
+			Como já visto anteriormente, o controlador PID no mundo contínuo é dado por:
 
 			\begin{equation}
-				C(s) = K_p
+				C(s) = K_p + \frac{K_i}{s} + K_d s
 			\end{equation}
 
-			Discretizando o controlador utilizando a transformada Z tabelada:
+			Aplicando a Transformada Bilinear (Tustin) para o termo integrador e a aproximação de Euler de atraso (Backward Euler) para o derivativo, a equação do controlador fica:
 
 			\begin{equation}
-				C(z) = Z\{K_p\} = K_p
+				C(z) = K_p + \frac{K_i T_s}{2} \frac{z + 1}{z - 1} + \frac{K_d}{T_s} \frac{z - 1}{z}
 			\end{equation}
 
-			Portanto, o controlador proporcional é invariante à discretização, ou seja, a função de transferência do controlador permanece a mesma tanto no domínio contínuo quanto no domínio discreto. Logo, o valor de $K_p$ escolhido para o controlador proporcional no domínio contínuo ($K_p = 30,35$) pode ser mantido para a implementação digital, desde que seja verificado que este valor se encaixa na faixa de ganhos permitida pela planta discretizada, o que é o caso para ambas as frequências de amostragem analisadas.
-			Deste modo, plotando a resposta ao degrau do sistema em malha fechada com o controlador proporcional em ambos os casos, com $10Hz$ e $66Hz$, é possível verificar que o sistema continua atendendo aos requisitos de desempenho definidos.
+			Substituindo os valores encontrados anteriormente para $K_p$, $K_i$ e $K_d$, e aplicando $T_s = 0{,}05$ s, tem-se o seguinte controlador no domínio $Z$:
+
+			\begin{equation}
+				C(z) = 169{,}5406 + 1{,}2068 \cdot \frac{z + 1}{z - 1} + 2600 \cdot \frac{z - 1}{z}
+			\end{equation}
+
+			Aplicando o controlador na planta e plotando a resposta ao degrau do sistema, obteve-se o resultado mostrado na Figura \ref{fig:resposta_degrau_gz_20hz}.
 
 			\begin{figure}[H]
 				\centering
-				\caption{Resposta ao degrau do sistema em malha fechada com controlador proporcional e $T_s=0,1s$.}
+				\caption{Resposta ao degrau do sistema em malha fechada com controlador PID digital.}
 
-				\includegraphics[width=0.8 \textwidth]{img/RespostaDegrau10hz.jpeg}
+				\includegraphics[width=0.8 \textwidth]{img/resposta_degrau_gz_20Hz.jpeg}
 
 				\vspace{.5em}
 				\textit{\footnotesize Fonte: Do autor}
-				\label{fig:resposta_degrau_10hz}
+				\label{fig:resposta_degrau_gz_20hz}
 			\end{figure}
+
+			Analisando a resposta ao degrau da malha fechada, é possível verificar que o percentual de sobressinal (PSS) se manteve dentro do requisito de projeto ($PSS \le 5\%$) e o tempo de acomodação foi drasticamente reduzido para $0{,}85$ s, valor significativamente abaixo dos $10$ s máximos requeridos.
+
+			É importante ressaltar que, apesar de o tempo de acomodação teórico ter ficado extremamente baixo, é impossível que essa resposta seja atingida na realidade. Como a planta física possui inércia, o veículo demanda um tempo finito para vencer a resistência hidrodinâmica inicial e começar a se deslocar após a aplicação da força. 
+			
+			Além disso, como visto anteriormente, os \textit{thrusters} responsáveis pela movimentação vertical do AUV conseguem exercer no máximo 35 N de força. Dessa forma, assumindo o início da operação, desconsiderando a ação derivativa (que causaria um pico de controle instantâneo impraticável no instante inicial) e considerando a ausência de erro acumulado, a ação do controlador é inteiramente determinada pela parcela proporcional. Nesse cenário, uma variação de profundidade de apenas $20{,}64$ cm é suficiente para levar os motores à saturação.
+
+		\subsection{Controlador DeadBeat}
+
+			Por fim, será analisada a viabilidade de implementação de um controlador DeadBeat na planta. Inicialmente, deve-se lembrar do formato da função de transferência da planta do AUV discretizada que foi encontrada:
+
+			\begin{equation}
+				G(z) = \frac{0{,}0526 \cdot \left(0{,}00101 \cdot z+0{,}0009\right)}{0{,}8842^2 \cdot (z-1) \cdot (z-e^{-0{,}04421})}
+			\end{equation}
+
+			Analisando a planta, percebe-se que ela possui um integrador $(z - 1)$, logo já atende ao requisito de ser do Tipo 1 em malha aberta. O segundo requisito para o projeto é que os polos e zeros da malha estejam dentro do círculo unitário, o que foi confirmado na análise do lugar das raízes feita anteriormente. Portanto, é possível implementar um controlador DeadBeat nesta planta. Para tanto, o controlador assume o seguinte formato:
+
+			\begin{equation}
+				C(z) = \frac{K \cdot N_c(z)}{D_c(z)}
+			\end{equation}
+
+			Os termos $N_c(z)$ e $D_c(z)$ são os polinômios a serem determinados para o controlador. Para o polinômio do numerador $N_c(z)$, será adotada a seguinte estrutura:
+
+			\begin{equation}
+				N_c(z) = z - e^{-0{,}04421}
+			\end{equation}
+
+			Com isto, um dos polos da planta é intencionalmente cancelado. Como esse polo (localizado em $z \approx 0{,}9568$) encontra-se estritamente dentro do círculo unitário, trata-se de uma dinâmica inerentemente estável que pode ser suprimida com segurança pelo controlador sem causar instabilidade interna no sistema. Além disso, esse cancelamento reduz a ordem da equação característica, simplificando o projeto. Já o termo $D_c(z)$ será assumido como:
+
+			\begin{equation}
+				D_c(z) = z - b_0
+			\end{equation}
+
+			Com estas considerações, e simplificando as constantes numéricas da planta, pode-se calcular os valores de $K$ e $b_0$ através da equação característica da malha fechada ($N_l(z) + D_l(z) = z^n$). Assumindo $n = 2$ (ordem do polinômio do denominador), tem-se que:
+
+			\begin{equation}
+				K \cdot 0{,}06728 \cdot (0{,}00101z + 0{,}0009) + (z - 1) \cdot (z - b_0) = z^2
+			\end{equation}
+
+			\begin{equation}
+				0{,}00006795 \cdot K \cdot z + 0{,}00006055 \cdot K + (z^2 - (b_0 + 1) \cdot z + b_0) = z^2
+			\end{equation}
+
+			Agrupando os termos de mesma ordem de $z$, é possível extrair as seguintes relações:
+
+			\begin{equation}
+				\begin{cases}
+					0{,}00006795 \cdot K - b_0 - 1 = 0 \\
+					0{,}00006055 \cdot K + b_0 = 0
+				\end{cases}
+			\end{equation}
+			
+			A resolução deste sistema linear resulta nos seguintes parâmetros de projeto:
+
+			\begin{equation}
+				\begin{cases}
+					b_0 = -0{,}4712\\
+					K = 7782{,}1012
+				\end{cases}
+			\end{equation}
+			
+			Com isto, o controlador DeadBeat final é dado pela equação:
+
+			\begin{equation}
+				C(z) = \frac{7782{,}1012 \cdot (z - e^{-0{,}04421})}{z + 0{,}4712}
+			\end{equation}
+
+			Aplicando este controlador na planta e simulando a resposta ao degrau unitário, obtém-se o comportamento ilustrado na Figura \ref{fig:resposta_degrau_deadbeat}.
 
 			\begin{figure}[H]
 				\centering
-				\caption{Resposta ao degrau do sistema em malha fechada com controlador proporcional e $T_s=0,015s$.}
+				\caption{Resposta ao degrau $C(z) \cdot G(z)$ com Controlador DeadBeat}
 
-				\includegraphics[width=0.8 \textwidth]{img/RespostaDegrau66hz.jpeg}
+				\includegraphics[width=0.8 \textwidth]{img/RespostaDegrauDeadBeat.jpeg}
 
 				\vspace{.5em}
 				\textit{\footnotesize Fonte: Do autor}
-				\label{fig:resposta_degrau_66hz}
+				\label{fig:resposta_degrau_deadbeat}
 			\end{figure}
 
-		\subsection{Controlador Proporcional-Derivativo}
+			Analisando a resposta em malha fechada, é possível verificar que a técnica atende rigorosamente aos limites teóricos de projeto, apresentando um sobressinal quase nulo ($1\%$) e um tempo de acomodação extremamente veloz de apenas $0{,}1$ s. Apesar do excelente desempenho matemático, a mesma problemática física observada no controlador PID deve ser ressaltada aqui: a inércia do veículo e a saturação dos atuadores impedem que o sistema real opere de forma tão agressiva. Na prática, um ganho da ordem de milhares faria com que os propulsores operassem saturados instantaneamente, tornando a aplicação direta deste controlador impraticável sem o uso de estratégias de suavização ou limitação de esforço de controle.
 
-			Na seção anterior foi demostrado que o controlador proporcional é suficiente para atender aos requisitos de desempenho da planta. De todo modo, no dominio continuo tambem foi implementado um controlador PD a fim de comparar o desempenho com o controlador proporcional, portanto esse mesmo controlador será discretizado para analisar seu desempenho no dominio discreto. Relembrando que não foi implementado um controlador PID por conta do integrador intrinscico na planta, o que ja garante erro nulo em regime permanente para entradas em degrau e a adição de um integrador no controlador tornaria o sistema 
+	\section{Conclusão}
 
-\section{Conclusão}
+		Este trabalho demonstrou de forma abrangente o ciclo completo de projeto de um sistema de controle de profundidade para o AUV Yvy, partindo dos princípios físicos da hidrodinâmica até a formulação de algoritmos de controle digital embarcado.
 
-	O presente trabalho abordou o desenvolvimento completo do sistema de controle de profundidade para o AUV Yvy, abrangendo desde a modelagem física até a validação do controlador em frequência. A obtenção do modelo matemático linearizado, fundamentado na física do arrasto hidrodinâmico e nos parâmetros reais do veículo, revelou uma planta de segunda ordem do Tipo 1, intrinsecamente capaz de anular erros de regime para entradas em degrau.
+		A modelagem matemática evidenciou que a planta vertical do veículo comporta-se como um sistema integrador com amortecimento, sendo marginalmente estável em malha aberta. A análise teórica indicou que um controlador estritamente Proporcional seria suficiente para a estabilização matemática. Contudo, as particularidades operacionais do veículo — em especial a flutuabilidade positiva inerente ao seu projeto mecânico — exigiram a adoção de uma ação integral para eliminar o erro em regime permanente.
 
-	A definição rigorosa dos requisitos de desempenho, priorizando a segurança operacional (sobressinal limitado a 5\%), guiou o projeto do controlador pelo método do Lugar das Raízes. A análise comparativa entre as estratégias de controle demonstrou que, embora a ação derivativa (PD) permitisse tempos de resposta inferiores a 1 segundo, tal agressividade implicaria em esforços de controle excessivos e sensibilidade a ruídos. Portanto, concluiu-se que o controlador puramente \textbf{Proporcional (P)}, com ganho ajustado para $K_p = 30,35$, representa a solução mais equilibrada, garantindo um tempo de acomodação satisfatório ($T_s \approx 3,5$ s) e robustez contra incertezas de modelagem.
+		O controlador PID projetado no domínio contínuo por meio do método de alocação de zeros (Lugar das Raízes) atendeu e superou todos os requisitos estipulados de segurança e rapidez, garantindo um sobressinal de $5\%$ e um tempo de acomodação de $2{,}52$ s. Além disso, a análise de resposta em frequência validou a robustez da malha, apresentando Margem de Ganho infinita e Margem de Fase de $86{,}5^\circ$, conferindo ao sistema alta tolerância a perturbações externas e ruídos de leitura do sensor de pressão.
 
-	Por fim, a análise da resposta em frequência validou a estabilidade e a robustez do projeto. O sistema apresentou Margem de Ganho infinita e uma Margem de Fase elevada ($\approx 73^\circ$), o que assegura um comportamento bem amortecido e tolerância a atrasos de transporte superiores a 1,8 segundos. A largura de banda obtida ($\approx 1$ rad/s) confirmou que o sistema de malha fechada atuará efetivamente no rastreamento de trajetórias de profundidade, filtrando naturalmente perturbações de alta frequência e ruídos de sensores, atendendo assim a todos os objetivos de engenharia propostos para a operação do AUV Yvy.
+		A etapa de discretização, projetada para a implementação em um microcomputador Raspberry Pi associado a uma controladora Pixhawk, foi um ponto crucial de validação. A escolha da taxa de amostragem de $20$ Hz revelou-se um excelente compromisso entre o atendimento rígido ao Teorema de Nyquist (com base na banda passante do sistema) e as restrições de tráfego do protocolo de comunicação Mavlink.
 
+		No entanto, a transição para o domínio discreto evidenciou o contraste expressivo entre a teoria de controle moderno e as limitações físicas do hardware. A simulação dos controladores digitais — tanto o PID discretizado quanto o controlador DeadBeat — resultou em respostas matemáticas ideais, mas que exigiriam esforços de controle imediatos muito altos. Verificou-se que variações de profundidade em degrau maiores que $20{,}64$ cm são suficientes para saturar a capacidade máxima de 35 N dos \textit{thrusters}. 
 
+		Apesar desta constatação, isso não inviabiliza a implementação do controlador PID no veículo. Na prática, essa característica indica apenas que, para manobras de descida ou subida mais longas, o AUV operará com seus motores em força máxima até se aproximar da referência. Uma vez que a distância ao alvo torne-se menor que a zona de saturação, o controlador assumirá a região linear, estacionando o veículo com a suavidade projetada. 
+
+		Conclui-se, portanto, que a modelagem e o controlador PID digital desenvolvidos são altamente adequados e estão prontos para implementação no AUV Yvy. A análise realizada garante que o sistema manterá a estabilidade e alcançará o desempenho esperado para a missão, garantindo a segurança operacional do robô em ambiente subaquático.
 
 	\clearpage
-	\bibliographystyle{plain}
 	\bibliography{referencias}
 
 	\clearpage
