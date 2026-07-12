@@ -1,18 +1,18 @@
 # Fdb version 4
-["bibtex main"] 1783817608.33033 "main.aux" "main.bbl" "main" 1783817672.45278 0
-  "./referencias.bib" 1783795846.23129 1561 86b8681f13dd39b566a135007a82222a ""
+["bibtex main"] 1783876943.65055 "main.aux" "main.bbl" "main" 1783878533.45288 0
+  "./referencias.bib" 1783874932.23823 1568 4d07b5cf2ce67bd649421f31b23684a4 ""
   "/usr/share/texlive/texmf-dist/bibtex/bib/abntex2/abntex2-options.bib" 1357081713 5396 4eb260dac60f150ae608d45252853090 ""
   "/usr/share/texlive/texmf-dist/bibtex/bst/abntex2/abntex2-alf.bst" 1543183680 60064 0819ac8568f9a482510a46e3a8a6f605 ""
-  "main.aux" 1783817672.34694 13025 4d3ec743c793ec6fd6e9c6cbcd4c77e6 "pdflatex"
+  "main.aux" 1783878533.34823 12958 b8dc9df6d33e3487f663fab723871a8f "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1783817671.61708 "/media/hak/HD1TB/Documentos/Hebert_Alan_Kubis/Repositorios/UFSC/controle-digital/main.tex" "main.pdf" "main" 1783817672.45299 0
+["pdflatex"] 1783878532.58137 "/media/hak/HD1TB/Documentos/Hebert_Alan_Kubis/Repositorios/UFSC/controle-digital/main.tex" "main.pdf" "main" 1783878533.4532 0
   "/etc/texmf/web2c/texmf.cnf" 1765492615.82701 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/hak/.texlive2025/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1000.600pk" 1783810243.56847 20008 95949069f64e14871a6cf1a90f20e1f6 ""
   "/home/hak/.texlive2025/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1200.600pk" 1779658788.67205 24132 02aaf1eb0b9649ba69c2e72b28c0e55c ""
-  "/media/hak/HD1TB/Documentos/Hebert_Alan_Kubis/Repositorios/UFSC/controle-digital/main.tex" 1783810990.91207 68723 77d6256bb0da1c453f4bbf90d85b53a8 ""
+  "/media/hak/HD1TB/Documentos/Hebert_Alan_Kubis/Repositorios/UFSC/controle-digital/main.tex" 1783878532.40424 68738 81cf124dabe9afc67b6abdfcecd6e519 ""
   "/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/adobe/symbol/psyr.tfm" 1136768653 1408 5937f58aa508ea2cea4901c07d10f5fe ""
@@ -155,11 +155,11 @@
   "img/respostaPID.jpg" 1781568638.01466 75230 672b9cb25928d769f69dbff4a78acb84 ""
   "img/resposta_degrau_gz_20Hz.jpeg" 1783788846.51168 48625 f563e453bf57f05b287981706ebeda94 ""
   "img/root_locus_Gs.jpg" 1781563358.48186 44829 a15fd8e0221e0baed12d5c5ddbd858cd ""
-  "main.aux" 1783817672.34694 13025 4d3ec743c793ec6fd6e9c6cbcd4c77e6 "pdflatex"
-  "main.bbl" 1783817608.34325 1425 20eb07cd3fa809540fc101af91e7a473 "bibtex main"
-  "main.out" 1783817672.34694 7193 c509dcd23235a6b0b76f26f00208bc0a "pdflatex"
-  "main.tex" 1783810990.91207 68723 77d6256bb0da1c453f4bbf90d85b53a8 ""
-  "main.toc" 1783817672.34694 3694 c84cc3930848fc13ff0877b168defda3 "pdflatex"
+  "main.aux" 1783878533.34823 12958 b8dc9df6d33e3487f663fab723871a8f "pdflatex"
+  "main.bbl" 1783876943.66089 1648 2f7a06413632d4c82976072e94a69339 "bibtex main"
+  "main.out" 1783878533.34823 7193 c509dcd23235a6b0b76f26f00208bc0a "pdflatex"
+  "main.tex" 1783878532.40424 68738 81cf124dabe9afc67b6abdfcecd6e519 ""
+  "main.toc" 1783878533.34823 3694 c84cc3930848fc13ff0877b168defda3 "pdflatex"
   "matlab/bodeGswithPID.m" 1783817121.79761 964 48a225b2656768ce26448f1f3d444aeb ""
   "matlab/respDegrauGzPID.m" 1783817671.15494 727 6c18f752e06f96f2efadc15882722a95 ""
   "matlab/respostaDegrauDeadBeat.m" 1783817663.69098 667 df2b175b5d9bba9923f43dbb21e22719 ""

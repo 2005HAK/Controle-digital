@@ -5,28 +5,32 @@
 \providecommand{\abntbstabout}[1]{}
 \abntbstabout{v-1.9.7 }
 
-\bibitem[Antonelli 2014]{antonelli2014}
-\abntrefinfo{Antonelli}{ANTONELLI}{2014}
-{ANTONELLI, G. \emph{Underwater Robots}. 3. ed. Cham: Springer, 2014.}
+\bibitem[Antonelli 2006]{antonelli}
+\abntrefinfo{Antonelli}{ANTONELLI}{2006}
+{ANTONELLI, G. \emph{Underwater Robots}. 2. ed. Alemanha: Springer, 2006.}
 
-\bibitem[Dorf e Bishop 2015]{dorf2017}
-\abntrefinfo{Dorf e Bishop}{DORF; BISHOP}{2015}
-{DORF, R.~C.; BISHOP, R.~H. \emph{Modern Control Systems}. 13. ed. [S.l.]: Pearson, 2015.}
+\bibitem[Dorf e Bishop 2016]{dorf}
+\abntrefinfo{Dorf e Bishop}{DORF; BISHOP}{2016}
+{DORF, R.~C.; BISHOP, R.~H. \emph{Modern Control Systems}. 13. ed. Boston: Pearson, 2016.}
 
-\bibitem[Fossen 2011]{fossen2011}
+\bibitem[Fossen 2011]{fossen}
 \abntrefinfo{Fossen}{FOSSEN}{2011}
 {FOSSEN, T.~I. \emph{Handbook of Marine Craft Hydrodynamics and Motion Control}. 1. ed. Chichester: John Wiley \& Sons, 2011.}
 
-\bibitem[Fox, McDonald e Pritchard 2014]{fox2014}
+\bibitem[Fox, McDonald e Pritchard 2014]{fox}
 \abntrefinfo{Fox, McDonald e Pritchard}{FOX; MCDONALD; PRITCHARD}{2014}
 {FOX, R.~W.; MCDONALD, A.~T.; PRITCHARD, P.~J. \emph{Introdução à Mecânica dos Fluidos}. 8. ed. Rio de Janeiro: LTC, 2014.}
 
-\bibitem[Franklin, Powell e Emami-Naeini 2015]{franklin2015}
-\abntrefinfo{Franklin, Powell e Emami-Naeini}{FRANKLIN; POWELL; EMAMI-NAEINI}{2015}
-{FRANKLIN, G.~F.; POWELL, J.~D.; EMAMI-NAEINI, A. \emph{Feedback Control of Dynamic Systems}. 8. ed. [S.l.]: Pearson, 2015.}
+\bibitem[Franklin, Powell e Emami-Naeini 2019]{franklin}
+\abntrefinfo{Franklin, Powell e Emami-Naeini}{FRANKLIN; POWELL; EMAMI-NAEINI}{2019}
+{FRANKLIN, G.~F.; POWELL, J.~D.; EMAMI-NAEINI, A. \emph{Feedback Control of Dynamic Systems}. 8. ed. [S.l.]: Pearson, 2019.}
 
-\bibitem[Ogata 2014]{ogata2014}
-\abntrefinfo{Ogata}{OGATA}{2014}
-{OGATA, K. \emph{Engenharia de Controle Moderno}. 5. ed. [S.l.]: Pearson, 2014.}
+\bibitem[Ogata 2010]{ogata}
+\abntrefinfo{Ogata}{OGATA}{2010}
+{OGATA, K. \emph{Engenharia de Controle Moderno}. 5. ed. São Paulo: Pearson, 2010.}
+
+\bibitem[Åström e Wittenmark 1997]{astrom}
+\abntrefinfo{Åström e Wittenmark}{ÅSTRöM; WITTENMARK}{1997}
+{ÅSTRöM, K.~J.; WITTENMARK, B. \emph{Computer-Controlled Systems -- Theory and Design}. 3. ed. Mainland: Prentice Hall, 1997.}
 
 \end{thebibliography}

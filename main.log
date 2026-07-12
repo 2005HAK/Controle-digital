@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2025/dev/Debian) (preloaded format=pdflatex 2026.2.15)  11 JUL 2026 21:54
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2025/dev/Debian) (preloaded format=pdflatex 2026.2.15)  12 JUL 2026 14:48
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -765,7 +765,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [17]
-<img/respostaPID.jpg, id=352, 1309.89375pt x 657.2053pt>
+<img/respostaPID.jpg, id=351, 1309.89375pt x 657.2053pt>
 File: img/respostaPID.jpg Graphic file (type jpg)
 <use img/respostaPID.jpg>
 Package pdftex.def Info: img/respostaPID.jpg  used on input line 652.
@@ -780,7 +780,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [18]
-<img/bodeMA.jpg, id=369, 1927.2pt x 958.58125pt>
+<img/bodeMA.jpg, id=368, 1927.2pt x 958.58125pt>
 File: img/bodeMA.jpg Graphic file (type jpg)
 <use img/bodeMA.jpg>
 Package pdftex.def Info: img/bodeMA.jpg  used on input line 683.
@@ -800,7 +800,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.5}) has
                                                   \__shipout_drop_firstpage_...
 l.689 
        <./img/respostaPID.jpg>]
-<img/BodeMF.jpg, id=378, 1927.2pt x 958.58125pt>
+<img/BodeMF.jpg, id=377, 1927.2pt x 958.58125pt>
 File: img/BodeMF.jpg Graphic file (type jpg)
 <use img/BodeMF.jpg>
 Package pdftex.def Info: img/BodeMF.jpg  used on input line 694.
@@ -866,7 +866,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [24]
-<img/LugarDasRaizesGz20hz.jpeg, id=445, 1201.48875pt x 876.27374pt>
+<img/LugarDasRaizesGz20hz.jpeg, id=442, 1201.48875pt x 876.27374pt>
 File: img/LugarDasRaizesGz20hz.jpeg Graphic file (type jpg)
 <use img/LugarDasRaizesGz20hz.jpeg>
 Package pdftex.def Info: img/LugarDasRaizesGz20hz.jpeg  used on input line 880.
@@ -895,7 +895,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.8}) has
                                                   \__shipout_drop_firstpage_...
 l.909 			\end{equation}
                         <./img/LugarDasRaizesGz20hz.jpeg>]
-<img/resposta_degrau_gz_20Hz.jpeg, id=465, 1606.0pt x 801.99625pt>
+<img/resposta_degrau_gz_20Hz.jpeg, id=462, 1606.0pt x 801.99625pt>
 File: img/resposta_degrau_gz_20Hz.jpeg Graphic file (type jpg)
 <use img/resposta_degrau_gz_20Hz.jpeg>
 Package pdftex.def Info: img/resposta_degrau_gz_20Hz.jpeg  used on input line 917.
@@ -924,7 +924,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [28]
-<img/RespostaDegrauDeadBeat.jpeg, id=485, 1606.0pt x 803.0pt>
+<img/RespostaDegrauDeadBeat.jpeg, id=482, 1606.0pt x 803.0pt>
 File: img/RespostaDegrauDeadBeat.jpeg Graphic file (type jpg)
 <use img/RespostaDegrauDeadBeat.jpeg>
 Package pdftex.def Info: img/RespostaDegrauDeadBeat.jpeg  used on input line 996.
@@ -1057,18 +1057,18 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: C509DCD23235A6B0B76F26F00208BC0A;7193.
  ) 
 Here is how much of TeX's memory you used:
- 16461 strings out of 475158
- 247429 string characters out of 5765758
+ 16466 strings out of 475158
+ 247370 string characters out of 5765758
  1223346 words of memory out of 5000000
- 38656 multiletter control sequences out of 15000+600000
+ 38660 multiletter control sequences out of 15000+600000
  599614 words of font info for 103 fonts, out of 8000000 for 9000
  16 hyphenation exceptions out of 8191
  75i,12n,131p,1671b,2116s stack positions out of 10000i,1000n,20000p,200000b,200000s
  </home/hak/.texlive2025/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1000.600pk> </home/hak/.texlive2025/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1200.600pk></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/rsfs/rsfs10.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/symbol/usyr.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/symbol/usyr.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on main.pdf (42 pages, 1044459 bytes).
+Output written on main.pdf (42 pages, 1044835 bytes).
 PDF statistics:
- 1167 PDF objects out of 1200 (max. 8388607)
- 984 compressed objects within 10 object streams
- 531 named destinations out of 1000 (max. 500000)
+ 1164 PDF objects out of 1200 (max. 8388607)
+ 981 compressed objects within 10 object streams
+ 532 named destinations out of 1000 (max. 500000)
  323 words of extra memory for PDF output out of 10000 (max. 10000000)
 
