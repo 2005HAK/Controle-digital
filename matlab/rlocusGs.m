@@ -5,10 +5,7 @@ G_s = (0.0526)/(s^2 + 0.8842*s);
 
 rlocus(G_s);
 
-% Adiciona o círculo unitário como referência de estabilidade
-hold on;
-%zgrid;                                                                                  % Função do MATLAB que desenha o círculo unitário e linhas de amortecimento
-axis equal;                                                                             % Garante que o círculo pareça um círculo
+hold on; axis equal;
 
 % Título e legendas para o gráfico
 title('Lugar das Raízes (Root Locus)');

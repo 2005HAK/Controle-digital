@@ -1,26 +1,23 @@
 clear; close all; clc;
 
-% --- 1. Definição do Sistema ---
+% Definição do Sistema
 s = tf("s");
 G_s = (0.0526)/(s^2 + 0.8842*s);
+
 K_d=130.0000;
 K_p=169.5406;
 K_i=48.2725;
 
 C_s = (K_d * s^2 + K_p * s + K_i)/(s);
 
-% --- 2. Malha Aberta (L) ---
-% A análise de estabilidade (Margens) é feita na MALHA ABERTA!
+% Malha Aberta (L)
 L = C_s * G_s;
 
-% --- 3. Malha Fechada (H) ---
-% A análise de velocidade (Largura de Banda) é feita na MALHA FECHADA!
+% Malha Fechada (H)
 H = feedback(L, 1);
 
-% --- 4. Plotagem e Cálculo das Margens ---
+% Plotagem e Calculo das Margens
 figure;
-%bode(L);
-% A função margin plota o Bode e já marca as margens visualmente
 margin(L); 
 grid on;
 title(['Diagrama de Bode de Malha Aberta (Cs)']);
@@ -29,16 +26,16 @@ title(['Diagrama de Bode de Malha Aberta (Cs)']);
 [Gm, Pm, Wcg, Wcp] = margin(L);
 margin_ganho_db = 20*log10(Gm);
 
-% --- 5. Plotagem da Malha Fechada e Largura de Banda ---
+% Plotagem da Malha Fechada e Largura de Banda
 figure;
 bode(H);
 grid on;
 title('Diagrama de Bode de Malha Fechada');
 
-% Calculando a largura de banda (frequência onde o ganho cai -3dB)
+% Calculando a largura de banda
 bw = bandwidth(H);
 
-% --- 6. Exibindo Resultados no Console ---
+% Exibe resultados
 disp('--- Análise de Resposta em Frequência ---');
 disp(['Margem de Ganho (MG): ' num2str(margin_ganho_db) ' dB']);
 disp(['Margem de Fase (MF):  ' num2str(Pm) ' graus']);
